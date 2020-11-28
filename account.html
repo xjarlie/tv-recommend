@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>LWTTV</title>
+        <link rel="stylesheet" href="css/style.css">
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <link type="text/css" rel="stylesheet" href="css/materialize.min.css"  media="screen,projection"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    </head>
+    <body onload="onLoad()">
+        <nav class="deep-orange">
+            <div class="nav-wrapper">
+              <a href="#" class="brand-logo">Account</a>
+              <a href="#" data-target="slide-out" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+              <ul id="nav-mobile" class="right hide-on-med-and-down">
+                <li><a href="index.html" class="waves-effect"><i class="material-icons">home</i>Home</a></li>
+                <li><a href="friends.html" class="waves-effect"><i class="material-icons">groups</i>Friends</a></li>
+                <li><a href="account.html" class="waves-effect active"><i class="material-icons">account_circle</i>Account</a></li>
+                
+              </ul>
+            </div>
+        </nav>
+          <ul id="slide-out" class="sidenav">
+            <li><a href="index.html" class="waves-effect"><i class="material-icons">home</i>Home</a></li>
+                <li><a href="friends.html" class="waves-effect"><i class="material-icons">groups</i>Friends</a></li>
+                <li class="active"><a href="account.html" class="waves-effect"><i class="material-icons">account_circle</i>Account</a></li>
+          </ul>
+
+        </br>
+
+        <div class="container">
+            <div class="row" id="progressbar">
+                <div class="progress">
+                    <div class="indeterminate"></div>
+                </div>
+            </div>
+            <div class="row deep-orange-text">
+                <form class="col s12">
+                    <div class="row">
+                        <div class="input-field">
+                            <i class="material-icons prefix">account_circle</i>
+                            <input disabled id="username" type="text">
+                            <label for="username" id="usernamelabel">Username Loading...</label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="input-field">
+                            <i class="material-icons prefix">email</i>
+                            <input disabled id="email" type="email">
+                            <label for="email" id="emaillabel">Email Address Loading...</label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <a class="waves-effect waves-light btn deep-orange disabled" onclick="resetPass()" id="resetPassBtn"><i class="material-icons left">lock</i>Reset password</a>
+                    </div>
+                    <div class="row">
+                        <button class="btn waves-effect red darken-4 disabled" onclick="signOut()" id="signOutBtn"><i class="material-icons left">exit_to_app</i>Sign Out</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- The core Firebase JS SDK is always required and must be listed first -->
+        <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-app.js"></script>
+
+        <!-- TODO: Add SDKs for Firebase products that you want to use
+            https://firebase.google.com/docs/web/setup#available-libraries -->
+            <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-auth.js"></script>
+            <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-database.js"></script>
+
+            <script type="text/javascript" src="js/materialize.min.js"></script>
+
+            <script>
+                // Your web app's Firebase configuration
+                var firebaseConfig = {
+                    apiKey: "AIzaSyDoxnxXrZrkmvwxqvGOd0HKxwMJgLHum_I",
+                    authDomain: "lwttv-8fcd8.firebaseapp.com",
+                    databaseURL: "https://lwttv-8fcd8.firebaseio.com",
+                    projectId: "lwttv-8fcd8",
+                    storageBucket: "lwttv-8fcd8.appspot.com",
+                    messagingSenderId: "326986084837",
+                    appId: "1:326986084837:web:56b983ce9bab9e397f7f0c"
+                };
+                // Initialize Firebase
+                firebase.initializeApp(firebaseConfig);
+                
+                document.addEventListener('DOMContentLoaded', function() {
+                    var elems = document.querySelectorAll('.sidenav');
+                    var instances = M.Sidenav.init(elems);
+                });
+
+
+                function onLoad() {
+                    firebase.auth().onAuthStateChanged(function(user) {
+                        if (user) {
+                            document.getElementById('resetPassBtn').classList.remove('disabled');
+                            document.getElementById('signOutBtn').classList.remove('disabled');
+
+                            firebase.database().ref('/Users/' + user.uid).once('value', function(snapshot) {
+                                var username = snapshot.val().username;
+                                document.getElementById('usernamelabel').innerHTML = username;
+                                document.getElementById('progressbar').hidden = true;
+                            });
+                            document.getElementById('emaillabel').innerHTML = user.email;
+                        } else {
+                            redirect('login.html?source=' + window.location.href);
+                        }
+                    });
+                }
+
+                function redirect(location) {
+                    window.location.href = location;
+                }
+
+                function resetPass() {
+                    var email = firebase.auth().currentUser.email;
+                    firebase.auth().sendPasswordResetEmail(email).then(function() {
+                        alert('Password reset email sent!')
+                    }).catch(function(error) {
+                        alert(error.message);
+                    });
+                }
+
+                function signOut() {
+                    if (confirm('Are you sure you want to sign out of your account?')) {
+                        firebase.auth().signOut();
+                    }
+                }
+            </script>
+    </body>
+</html>

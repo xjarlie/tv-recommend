@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>LWTTV</title>
+        <link rel="stylesheet" href="css/style.css">
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <link type="text/css" rel="stylesheet" href="css/materialize.min.css"  media="screen,projection"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    </head>
+    <body onload="onLoad()">
+        <nav class="deep-orange">
+            <div class="nav-wrapper">
+              <a href="#" class="brand-logo">Friends</a>
+              <a href="#" data-target="slide-out" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+              <ul id="nav-mobile" class="right hide-on-med-and-down">
+                <li><a href="index.html" class="waves-effect"><i class="material-icons">home</i>Home</a></li>
+                <li><a href="friends.html" class="waves-effect"><i class="material-icons">groups</i>Friends</a></li>
+                <li><a href="account.html" class="waves-effect"><i class="material-icons">account_circle</i>Account</a></li>
+                
+              </ul>
+            </div>
+        </nav>
+          <ul id="slide-out" class="sidenav">
+            <li><a href="index.html" class="waves-effect"><i class="material-icons">home</i>Home</a></li>
+                <li class="active"><a href="friends.html" class="waves-effect"><i class="material-icons">groups</i>Friends</a></li>
+                <li><a href="account.html" class="waves-effect"><i class="material-icons">account_circle</i>Account</a></li>
+          </ul>
+
+        </br>
+
+        <div class="container">
+            <div class="row" id="progressbar">
+                <div class="progress">
+                    <div class="indeterminate"></div>
+                </div>
+            </div>
+            <ul class="collection" id="friendlist">
+                
+            </ul>
+        </div>
+        <div class="fixed-action-btn">
+            <a class="btn-floating btn-large deep-orange waves-effect" onclick="redirect('addfriend.html')">
+                <i class="large material-icons">add</i>
+            </a>
+        </div>
+
+        <!-- The core Firebase JS SDK is always required and must be listed first -->
+        <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-app.js"></script>
+
+        <!-- TODO: Add SDKs for Firebase products that you want to use
+            https://firebase.google.com/docs/web/setup#available-libraries -->
+            <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-auth.js"></script>
+            <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-database.js"></script>
+
+            <script type="text/javascript" src="js/materialize.min.js"></script>
+
+            <script>
+                // Your web app's Firebase configuration
+                var firebaseConfig = {
+                    apiKey: "AIzaSyDoxnxXrZrkmvwxqvGOd0HKxwMJgLHum_I",
+                    authDomain: "lwttv-8fcd8.firebaseapp.com",
+                    databaseURL: "https://lwttv-8fcd8.firebaseio.com",
+                    projectId: "lwttv-8fcd8",
+                    storageBucket: "lwttv-8fcd8.appspot.com",
+                    messagingSenderId: "326986084837",
+                    appId: "1:326986084837:web:56b983ce9bab9e397f7f0c"
+                };
+                // Initialize Firebase
+                firebase.initializeApp(firebaseConfig);
+                
+                document.addEventListener('DOMContentLoaded', function() {
+                    var elems = document.querySelectorAll('.sidenav');
+                    var instances = M.Sidenav.init(elems);
+                });
+
+                function redirect(location) {
+                    window.location.href = location;
+                }
+
+                function displayFriend(uid) {
+                    firebase.database().ref('Users/' + uid + '/username').once('value', function(val) {
+                        document.getElementById('friendlist').innerHTML += '<li class="collection-item">' + val.val() + '</li>';
+                    });
+                }
+                
+                function onLoad() {
+                    firebase.auth().onAuthStateChanged(function(user) {
+                        if (user) {
+                            
+                            firebase.database().ref('Users/' + user.uid + '/Friends').on('child_added', function(data) {
+                                document.getElementById('progressbar').hidden = true;
+                                displayFriend(data.val());
+                            });
+                        } else {
+                            redirect('login.html?source=' + window.location.href);
+                        }
+                    });
+                }
+            </script>
+    </body>
+</html>

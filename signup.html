@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>LWTTV</title>
+        <link rel="stylesheet" href="css/style.css">
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <link type="text/css" rel="stylesheet" href="css/materialize.min.css"  media="screen,projection"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    </head>
+    <body onload="onLoad()">
+        <nav class="deep-orange">
+            <div class="nav-wrapper">
+              <a href="#" class="brand-logo left-align">Sign Up</a>
+              <a href="#" data-target="slide-out" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+              <ul id="nav-mobile" class="right hide-on-med-and-down">
+                <li><a href="index.html" class="waves-effect"><i class="material-icons">home</i>Home</a></li>
+                <li><a href="friends.html" class="waves-effect"><i class="material-icons">groups</i>Friends</a></li>
+                <li><a href="account.html" class="waves-effect"><i class="material-icons">account_circle</i>Account</a></li>
+              </ul>
+              
+            </div>
+          </nav>
+          <ul id="slide-out" class="sidenav">
+            <li><a href="index.html" class="waves-effect"><i class="material-icons">home</i>Home</a></li>
+                <li><a href="friends.html" class="waves-effect"><i class="material-icons">groups</i>Friends</a></li>
+                <li><a href="account.html" class="waves-effect"><i class="material-icons">account_circle</i>Account</a></li>
+          </ul>
+          
+
+        </br>
+        <div class="container">
+            <div class="row deep-orange-text">
+                <form class="col s12">
+                    <div class="row">
+                        <div class="input-field">
+                            <i class="material-icons prefix">account_circle</i>
+                            <input id="username" type="text">
+                            <label for="username">Username</label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="input-field">
+                            <i class="material-icons prefix">email</i>
+                            <input id="email" type="text">
+                            <label for="email">Email Address</label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="input-field">
+                            <i class="material-icons prefix">lock</i>
+                            <input id="password" type="password">
+                            <label for="email">Password</label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <a class="waves-effect waves-light btn deep-orange" onclick="signUp()">Sign Up</a>
+                    </div>
+                    <div class="row">
+                        <a href="login.html"><p class="flow-text deep-orange-text">Already have an account? Click here to log in</p></a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- The core Firebase JS SDK is always required and must be listed first -->
+        <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-app.js"></script>
+
+        <!-- TODO: Add SDKs for Firebase products that you want to use
+            https://firebase.google.com/docs/web/setup#available-libraries -->
+            <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-auth.js"></script>
+            <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-database.js"></script>
+
+            <script type="text/javascript" src="js/materialize.min.js"></script>
+        <script>
+            // Your web app's Firebase configuration
+            var firebaseConfig = {
+                apiKey: "AIzaSyDoxnxXrZrkmvwxqvGOd0HKxwMJgLHum_I",
+                authDomain: "lwttv-8fcd8.firebaseapp.com",
+                databaseURL: "https://lwttv-8fcd8.firebaseio.com",
+                projectId: "lwttv-8fcd8",
+                storageBucket: "lwttv-8fcd8.appspot.com",
+                messagingSenderId: "326986084837",
+                appId: "1:326986084837:web:56b983ce9bab9e397f7f0c"
+            };
+            // Initialize Firebase
+            firebase.initializeApp(firebaseConfig);
+
+            var userglobal;
+            function onLoad() {
+                firebase.auth().onAuthStateChanged(function(user) {
+                    if (user) {
+                        console.log('user');
+                        userglobal = user;
+                        var existingUsername;
+                        firebase.database().ref('Users/' + user.uid).once('value').then(function(snapshot) {
+                            if (snapshot.val()) {
+                                proceed();
+                            } else {
+                                var newUsername = document.getElementById('username').value;
+                                firebase.database().ref('Users/' + user.uid + '/username').set(newUsername);
+                                console.log('username set');
+                                proceed();
+                            }
+                        });
+                    } else {
+                        
+                    }
+                });
+            }
+
+            function proceed() {
+                if (window.location.search) {
+                                redirect(window.location.search.split('?source=')[1]);
+                            } else {
+                                redirect('index.html');
+                            }
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+                var elems = document.querySelectorAll('.sidenav');
+                var instances = M.Sidenav.init(elems);
+            });
+
+            function redirect(location) {
+                window.location.href = location;
+            }
+
+            function login(email, password) {
+                firebase.auth().signInWithEmailAndPassword(email, password).catch(function(error) {
+                    // Handle Errors here.
+                    var errorCode = error.code;
+                    var errorMessage = error.message;
+                });
+            }
+
+            function signUp() {
+                var username = document.getElementById('username').value;
+                var email = document.getElementById('email').value;
+                var password = document.getElementById('password').value;
+                if (username && email && password) {
+                    firebase.auth().createUserWithEmailAndPassword(email, password).catch(function(error) {
+                        // Handle Errors here.
+                        var errorCode = error.code;
+                        var errorMessage = error.message;
+                        // ...
+                        alert(errorMessage);
+                    });
+                } else {
+                    alert('Please fill out all fields');
+                }
+            }
+        </script>
+    </body>
+</html>

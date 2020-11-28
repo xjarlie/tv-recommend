@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>LWTTV</title>
+        <link rel="stylesheet" href="css/style.css">
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <link type="text/css" rel="stylesheet" href="css/materialize.min.css"  media="screen,projection"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <style>
+            .checked {
+  color: orange;
+}
+        </style>
+    </head>
+    <body onload="onLoad()">
+        <nav class="deep-orange" style="top: 0;">
+            <div class="nav-wrapper">
+              <a href="#" class="brand-logo">View Post</a>
+              <a href="index.html" class="sidenav-trigger"><i class="material-icons">arrow_back</i></a>
+              <ul id="nav-mobile" class="right hide-on-med-and-down">
+                <li><a href="index.html" class="waves-effect"><i class="material-icons">home</i>Home</a></li>
+                <li><a href="friends.html" class="waves-effect"><i class="material-icons">groups</i>Friends</a></li>
+                <li><a href="account.html" class="waves-effect"><i class="material-icons">account_circle</i>Account</a></li>
+                
+              </ul>
+            </div>
+        </nav>
+          <ul id="slide-out" class="sidenav">
+                <li><a href="index.html" class="waves-effect"><i class="material-icons">home</i>Home</a></li>
+                <li><a href="friends.html" class="waves-effect"><i class="material-icons">groups</i>Friends</a></li>
+                <li><a href="account.html" class="waves-effect"><i class="material-icons">account_circle</i>Account</a></li>
+          </ul>
+          
+
+          <div class="container">
+            <div class="row" id="progressbar">
+                <div class="progress">
+                    <div class="indeterminate"></div>
+                </div>
+            </div>
+              <div class="row"><h4 id="title"></h2></div>
+              <div class="row" hidden=true id="rating">
+                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+                <span class="fa fa-star" id="star-1"></span>
+                <span class="fa fa-star" id="star-2"></span>
+                <span class="fa fa-star" id="star-3"></span>
+                <span class="fa fa-star" id="star-4"></span>
+                <span class="fa fa-star" id="star-5"></span>
+              </div>
+              <div class="row"><p id="author" class="flow-text" style="color: darkgrey; font-weight: bold;"></p></div>
+              <div class="row" id="watchlistadd" hidden=true>
+                <button class="btn waves-effect deep-orange" type="button" onclick="watchlist()"><i class="large material-icons left">playlist_add</i>Add to Watchlist</button>
+              </div>
+              <div class="row"><p id="source" class="flow-text" style="font-weight: bolder;"></p></div>
+              <div class="row"><p id="description" class="flow-text"></p></div>
+              <div class="row" id="tags"></div>
+              
+              <div class="row" hidden=true id="delete">
+                  <button class="btn waves-effect red darken-4" type="button" onclick="deletePost()"><i class="material-icons left">delete</i>Delete Post</button>
+              </div>
+          </div>
+        </br>
+
+        <script src="jquery.min.js"></script>
+        <!-- The core Firebase JS SDK is always required and must be listed first -->
+        <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-app.js"></script>
+
+        <!-- TODO: Add SDKs for Firebase products that you want to use
+            https://firebase.google.com/docs/web/setup#available-libraries -->
+            <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-auth.js"></script>
+            <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-database.js"></script>
+
+            <script type="text/javascript" src="js/materialize.min.js"></script>
+
+            <script>
+                // Your web app's Firebase configuration
+                var firebaseConfig = {
+                    apiKey: "AIzaSyDoxnxXrZrkmvwxqvGOd0HKxwMJgLHum_I",
+                    authDomain: "lwttv-8fcd8.firebaseapp.com",
+                    databaseURL: "https://lwttv-8fcd8.firebaseio.com",
+                    projectId: "lwttv-8fcd8",
+                    storageBucket: "lwttv-8fcd8.appspot.com",
+                    messagingSenderId: "326986084837",
+                    appId: "1:326986084837:web:56b983ce9bab9e397f7f0c"
+                };
+                // Initialize Firebase
+                firebase.initializeApp(firebaseConfig);
+
+                var postID = window.location.search.split('?id=')[1];
+                var uid;
+                function onLoad() {
+                    firebase.auth().onAuthStateChanged(function(user) {
+                        if (user) {
+                            uid = user.uid;
+
+                            
+                            firebase.database().ref('Posts/' + postID + '/author').once('value', function(snapshot) {
+                                if (snapshot.val() == uid) {
+                                    document.getElementById('delete').hidden = false;
+                                }
+                                document.getElementById('watchlistadd').hidden = false;
+                            })
+                        } else {    
+                            redirect('login.html?source=' + window.location.href);
+                        }
+                    });
+
+                    var postID = window.location.search.split('?id=')[1];
+                    firebase.database().ref('Posts/' + postID).once('value', function(snapshot) {
+                        firebase.database().ref('Users/' + snapshot.val().author + '/username').once('value', function(snapshot2) {
+                            document.getElementById('author').innerHTML = snapshot2.val();
+                        });
+                        document.getElementById('title').innerHTML = snapshot.val().title;
+                        document.getElementById('description').innerHTML = snapshot.val().description || '';
+                        if (snapshot.val().source) {
+                            document.getElementById('source').innerHTML = 'Watched on: ' + snapshot.val().source;
+                        }
+
+                        if (snapshot.val().tags) {
+                            snapshot.val().tags.forEach(function(tag) {
+                            var chip = document.createElement('div');
+                            chip.classList = 'chip';
+                            chip.innerHTML = tag;
+                            document.getElementById('tags').appendChild(chip);
+                        });
+                        }
+                        if (snapshot.val().rating) {
+                            document.getElementById('rating').hidden = false;
+                            var rating = snapshot.val().rating;
+                            var i = 1;
+                            while (i <= rating) {
+                                document.getElementById('star-' + i).classList += ' checked';
+                                i++;
+                            }
+                        }
+                        document.getElementById('progressbar').hidden = true;
+                    });
+
+                }
+
+                function redirect(location) {
+                    window.location.href = location;
+                }
+
+                document.addEventListener('DOMContentLoaded', function() {
+                    var elems = document.querySelectorAll('.sidenav');
+                    var instances = M.Sidenav.init(elems);
+                });
+
+                document.addEventListener('DOMContentLoaded', function() {
+                    var elems = document.querySelectorAll('.chips');
+                    var instances = M.Chips.init(elems);
+                });
+
+                function deletePost() {
+                    var postID = window.location.search.split('?id=')[1];
+
+                    //Check that the user is the post author
+                    var userIsAuthor = false;
+                    firebase.database().ref('Posts/' + postID + '/author').once('value', function(snapshot) {
+                        if (snapshot.val() == uid) {
+                            userIsAuthor = true;
+                        }
+                    }).then(function() {
+                        //Delete the post    
+                        if (confirm('Are you sure you want to delete this recommendation forever?')) {
+                            firebase.database().ref('Posts/' +  postID).set(null);
+                            firebase.database().ref('Users/' + uid + '/Posts').on('child_added', function(data) {
+                                if (data.val() == postID) {
+                                    firebase.database().ref('Users/' + uid + '/Posts/' + data.key).set(null);
+                                    redirect('index.html');
+                                }
+                            });
+                        }   
+                    });
+                }
+
+                function watchlist() {
+                    firebase.database().ref('Users/' + uid + '/Watchlist').once('value', function(snapshot) {
+                        snapshot.forEach((childSnapshot) => {
+                            console.log(childSnapshot.val());
+                        });
+                    });
+
+                    //firebase.database().ref('Users/' + uid + '/Watchlist').push(postID);
+                    //M.toast({html: 'Added to watchlist'});
+                }
+            </script>
+    </body>
+</html>

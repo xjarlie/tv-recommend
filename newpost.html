@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>LWTTV</title>
+        <link rel="stylesheet" href="css/style.css">
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <link type="text/css" rel="stylesheet" href="css/materialize.min.css"  media="screen,projection"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <style>
+            /*.rating {
+    float:left;
+    width:300px;
+}*/
+.rating span { float:right; position:relative; }
+.rating span input {
+    position:absolute;
+    top:0px;
+    left:0px;
+    opacity:0;
+}
+.rating span label {
+    display:inline-block;
+    width:30px;
+    height:30px;
+    text-align:center;
+    color:#FFF;
+    background:#ccc;
+    font-size:30px;
+    margin-right:2px;
+    line-height:30px;
+    border-radius:50%;
+    -webkit-border-radius:50%;
+}
+.rating span:hover ~ span label,
+.rating span:hover label,
+.rating span.checked label,
+.rating span.checked ~ span label {
+    background:#F90;
+    color:#FFF;
+}
+        </style>
+    </head>
+    <body onload="onLoad()">
+        <nav class="deep-orange">
+            <div class="nav-wrapper">
+              <a href="#" class="brand-logo">Recommendation</a>
+              <a href="index.html" class="sidenav-trigger"><i class="material-icons">arrow_back</i></a>
+              <ul id="nav-mobile" class="right hide-on-med-and-down">
+                <li><a href="index.html" class="waves-effect"><i class="material-icons">home</i>Home</a></li>
+                <li><a href="friends.html" class="waves-effect"><i class="material-icons">groups</i>Friends</a></li>
+                <li><a href="account.html" class="waves-effect"><i class="material-icons">account_circle</i>Account</a></li>
+                
+              </ul>
+            </div>
+        </nav>
+          <ul id="slide-out" class="sidenav">
+            <li><a href="index.html" class="waves-effect"><i class="material-icons">home</i>Home</a></li>
+                <li><a href="friends.html" class="waves-effect"><i class="material-icons">groups</i>Friends</a></li>
+                <li><a href="account.html" class="waves-effect"><i class="material-icons">account_circle</i>Account</a></li>
+          </ul>
+          
+
+        </br>
+
+        <div class="container">
+            <div class="row" id="progressbar">
+                <div class="progress">
+                    <div class="indeterminate"></div>
+                </div>
+            </div>
+            <div class="row deep-orange-text">
+                <form class="col s12">
+                    <div class="row">
+                        <b>
+                        <div class="input-field">
+                            <input id="title" type="text">
+                            <label for="title">TV Show/Movie Title</label>
+                        </div>
+                        </b>
+                    </div>
+                    <div class="row">
+                        <h6>Rating:</h6>
+                    </div>
+                    <div class="row" style="float: left;">
+                        
+                        <div class="rating">
+                            <span><input type="radio" name="rating" id="str5" value="5"><label for="str5"></label></span>
+                            <span><input type="radio" name="rating" id="str4" value="4"><label for="str4"></label></span>
+                            <span><input type="radio" name="rating" id="str3" value="3"><label for="str3"></label></span>
+                            <span><input type="radio" name="rating" id="str2" value="2"><label for="str2"></label></span>
+                            <span><input type="radio" name="rating" id="str1" value="1"><label for="str1"></label></span>
+                        </div>
+                    </div>
+                </br>
+            </br>
+        </br>
+                    <div class="row">
+                        <div class="input-field">
+                            <textarea id="description" class="materialize-textarea"></textarea>
+                            <label for="description">A Short Review</label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="input-field">
+                            <input id="source" type="text">
+                            <label for="source">Where did you watch it? (Netflix, Amazon, etc)</label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label>Descriptor tags</label>
+                        <div class="chips" id="descriptors">
+                            
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <a class="waves-effect waves-light btn deep-orange disabled" onclick="post()" id="recommendBtn"><i class="material-icons left">add</i>Loading...</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+
+        <script src="jquery.min.js"></script>
+        <!-- The core Firebase JS SDK is always required and must be listed first -->
+        <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-app.js"></script>
+
+        <!-- TODO: Add SDKs for Firebase products that you want to use
+            https://firebase.google.com/docs/web/setup#available-libraries -->
+            <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-auth.js"></script>
+            <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-database.js"></script>
+
+            <script type="text/javascript" src="js/materialize.min.js"></script>
+
+            <script>
+                // Your web app's Firebase configuration
+                var firebaseConfig = {
+                    apiKey: "AIzaSyDoxnxXrZrkmvwxqvGOd0HKxwMJgLHum_I",
+                    authDomain: "lwttv-8fcd8.firebaseapp.com",
+                    databaseURL: "https://lwttv-8fcd8.firebaseio.com",
+                    projectId: "lwttv-8fcd8",
+                    storageBucket: "lwttv-8fcd8.appspot.com",
+                    messagingSenderId: "326986084837",
+                    appId: "1:326986084837:web:56b983ce9bab9e397f7f0c"
+                };
+                // Initialize Firebase
+                firebase.initializeApp(firebaseConfig);
+
+                function onLoad() {
+                    firebase.auth().onAuthStateChanged(function(user) {
+                        if (user) {
+                            document.getElementById('recommendBtn').classList.remove('disabled');
+                            document.getElementById('recommendBtn').innerHTML = '<i class="material-icons left">add</i>Recommend';
+                            document.getElementById('progressbar').hidden = true;
+                        } else {
+                        
+                        }
+                    });
+                }
+                var rating;
+                $(document).ready(function(){
+                    // Check Radio-box
+                    $(".rating input:radio").attr("checked", false);
+
+                    $('.rating input').click(function () {
+                        $(".rating span").removeClass('checked');
+                        $(this).parent().addClass('checked');
+                    });
+
+                    $('input:radio').change(
+                        function(){
+                            var userRating = this.value;
+                            rating = userRating;
+                        }
+                    ); 
+                });
+
+                function redirect(location) {
+                    window.location.href = location;
+                }
+
+                document.addEventListener('DOMContentLoaded', function() {
+                    var elems = document.querySelectorAll('.sidenav');
+                    var instances = M.Sidenav.init(elems);
+                });
+
+                document.addEventListener('DOMContentLoaded', function() {
+                    var elems = document.querySelectorAll('.chips');
+                    var instances = M.Chips.init(elems);
+                });
+
+                function post() {
+                    document.getElementById('recommendBtn').classList.add('disabled');
+
+                    var title = document.getElementById('title').value;
+                    var description = document.getElementById('description').value || '';
+                    var tagsNodeList = document.getElementById('descriptors').childNodes || [];
+                    var source = document.getElementById('source').value || '';
+                    var tags = [];
+                    tagsNodeList.forEach(function(item, index) {
+                        var inner = item.textContent;
+                        var tag;
+                        if (inner.includes('close')) {
+                            tag = inner.split('close')[0];
+                        }
+                        if (tag) {
+                            tags.push(tag);
+                        }
+                    });
+
+                    if (title && rating) {
+                        var userID = firebase.auth().currentUser.uid;
+                        var ref = firebase.database().ref('Posts').push();
+                        ref.set({
+                            title: title,
+                            description: description,
+                            tags: tags,
+                            author: userID,
+                            source: source,
+                            rating: rating
+                        }).then(function() {
+                            firebase.database().ref('Users/' + userID + '/Posts').push(ref.key).then(function() {
+                                redirect('index.html');
+                            });
+                        });
+
+
+                    } else {
+                        alert('Please enter title and rating');
+                        document.getElementById('recommendBtn').classList.remove('disabled');
+                    }
+                }
+            </script>
+    </body>
+</html>

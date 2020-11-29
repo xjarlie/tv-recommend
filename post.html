@@ -56,6 +56,9 @@
               <div class="row"><p id="source" class="flow-text" style="font-weight: bolder;"></p></div>
               <div class="row"><p id="description" class="flow-text"></p></div>
               <div class="row" id="tags"></div>
+              <div class="row" id="watchrow" hidden=true>
+                  <a class="waves-effect btn deep-orange" id="wheretowatch"><i class="material-icons left">open_in_new</i>Where to watch</a>
+              </div>
               
               <div class="row" hidden=true id="delete">
                   <button class="btn waves-effect red darken-4" type="button" onclick="deletePost()"><i class="material-icons left">delete</i>Delete Post</button>
@@ -105,7 +108,8 @@
                                 }
                             })
 
-                            
+                            document.getElementById('watchrow').hidden = false;
+
                             firebase.database().ref('Users/' + uid + '/Watchlist/' + postID).once('value', function(snapshot) {
                                 document.getElementById('watchlist').hidden = false;
                                 
@@ -132,6 +136,7 @@
                         });
 
                         document.getElementById('author-link').href = 'user.html?id=' + snapshot.val().author;
+                        document.getElementById('wheretowatch').href = 'https://justwatch.com/uk/search?q=' + snapshot.val().title;
 
                         document.getElementById('title').innerHTML = snapshot.val().title;
                         document.getElementById('description').innerHTML = snapshot.val().description || '';

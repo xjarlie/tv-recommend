@@ -75,7 +75,7 @@
                         <b>
                         <div class="input-field">
                             <input id="title" type="text">
-                            <label for="title">TV Show/Movie Title</label>
+                            <label for="title" class="active">TV Show/Movie Title</label>
                         </div>
                         </b>
                     </div>
@@ -98,17 +98,17 @@
                     <div class="row">
                         <div class="input-field">
                             <textarea id="description" class="materialize-textarea"></textarea>
-                            <label for="description">A Short Review</label>
+                            <label for="description">A Short Review (Optional)</label>
                         </div>
                     </div>
                     <div class="row">
                         <div class="input-field">
                             <input id="source" type="text">
-                            <label for="source">Where did you watch it? (Netflix, Amazon, etc)</label>
+                            <label for="source">Where did you watch it? (Netflix, Amazon, etc) (Optional)</label>
                         </div>
                     </div>
                     <div class="row">
-                        <label>Descriptor tags</label>
+                        <label>Descriptor tags (Optional)</label>
                         <div class="chips" id="descriptors">
                             
                         </div>
@@ -147,12 +147,21 @@
                 // Initialize Firebase
                 firebase.initializeApp(firebaseConfig);
 
+                var fromID = window.location.search.split('?from=')[1];
                 function onLoad() {
                     firebase.auth().onAuthStateChanged(function(user) {
                         if (user) {
                             document.getElementById('recommendBtn').classList.remove('disabled');
                             document.getElementById('recommendBtn').innerHTML = '<i class="material-icons left">add</i>Recommend';
                             document.getElementById('progressbar').hidden = true;
+
+                            
+                            if (fromID) {
+                                firebase.database().ref('Posts/' + fromID).once('value', function(snapshot) {
+                                    document.getElementById('title').value = snapshot.val().title;
+                                    M.updateTextFields();
+                                })
+                            }
                         } else {
                         
                         }
@@ -221,6 +230,10 @@
                             rating: rating
                         }).then(function() {
                             firebase.database().ref('Users/' + userID + '/Posts').push(ref.key).then(function() {
+                                if (fromID) {
+                                    firebase.database().ref('Users/' + userID + '/Watchlist/' + fromID).set(null);
+                                }
+
                                 redirect('index.html');
                             });
                         });

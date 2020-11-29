@@ -51,7 +51,7 @@
               </div>
               <div class="row"><p id="author" class="flow-text" style="color: darkgrey; font-weight: bold;"></p></div>
               <div class="row" id="watchlist" hidden=true>
-                  <button type="button" class="waves-effect btn deep-orange" onclick="addToWatchlist()"><i class="material-icons left">playlist_add</i>Add to watchlist</button>
+                  <button type="button" class="waves-effect btn deep-orange" id="watchlistbtn"></button>
               </div>
               <div class="row"><p id="source" class="flow-text" style="font-weight: bolder;"></p></div>
               <div class="row"><p id="description" class="flow-text"></p></div>
@@ -90,6 +90,9 @@
 
                 var postID = window.location.search.split('?id=')[1];
                 var uid;
+                var watchlistBtn = document.getElementById('watchlistbtn');
+                var watchlistRow = document.getElementById('watchlist');
+                
                 function onLoad() {
                     firebase.auth().onAuthStateChanged(function(user) {
                         if (user) {
@@ -101,7 +104,20 @@
                                     document.getElementById('delete').hidden = false;
                                 }
                             })
-                            document.getElementById('watchlist').hidden = false;
+
+                            
+                            firebase.database().ref('Users/' + uid + '/Watchlist/' + postID).once('value', function(snapshot) {
+                                document.getElementById('watchlist').hidden = false;
+                                
+                                if (snapshot.val()) {
+                                    watchlistBtn.innerHTML = '<i class="material-icons left">remove_circle_outline</i>Remove from watchlist';
+                                    watchlistBtn.onclick = function() {removeFromWatchlist()};
+                                } else {
+                                    watchlistBtn.innerHTML = '<i class="material-icons left">playlist_add</i>Add to watchlist';
+                                    watchlistBtn.onclick = function() {addToWatchlist()};
+                                }
+                            })
+                            
 
                             firebase.database().ref('Users/' + uid + '/Watchlist/item').set('item');
                         } else {    
@@ -180,14 +196,19 @@
                 }
 
                 function addToWatchlist() {
-                    firebase.database().ref('Users/' + uid + '/Watchlist/' + postID).once('value', function(snapshot) {
-                        if (!snapshot.val()) {
-                            firebase.database().ref('Users/' + uid + '/Watchlist/' + postID).set(postID);
-                            M.toast({html: 'Added to watchlist'});
-                        } else {
-                            M.toast({html: 'Item already in watchlist'});
-                        }
-                    })
+                    firebase.database().ref('Users/' + uid + '/Watchlist/' + postID).set(postID);
+                    M.toast({html: 'Added to watchlist'});
+
+                    watchlistBtn.innerHTML = '<i class="material-icons left">remove_circle_outline</i>Remove from watchlist';
+                    watchlistBtn.onclick = function() {removeFromWatchlist()};
+                }
+
+                function removeFromWatchlist() {
+                    firebase.database().ref('Users/' + uid + '/Watchlist/' + postID).set(null);
+                    M.toast({html: 'Removed from watchlist'});
+
+                    watchlistBtn.innerHTML = '<i class="material-icons left">playlist_add</i>Add to watchlist';
+                    watchlistBtn.onclick = function() {addToWatchlist()};
                 }
             </script>
     </body>

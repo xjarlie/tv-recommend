@@ -15,6 +15,7 @@
               <ul id="nav-mobile" class="right hide-on-med-and-down">
                 <li><a href="index.html" class="waves-effect"><i class="material-icons">home</i>Home</a></li>
                 <li><a href="friends.html" class="waves-effect"><i class="material-icons">groups</i>Friends</a></li>
+                <li><a href="watchlist.html" class="waves-effect"><i class="material-icons darkmode-text">list</i>Watchlist</a></li>
                 <li><a href="account.html" class="waves-effect"><i class="material-icons">account_circle</i>Account</a></li>
                 
               </ul>
@@ -23,6 +24,7 @@
           <ul id="slide-out" class="sidenav">
             <li><a href="index.html" class="waves-effect"><i class="material-icons">home</i>Home</a></li>
                 <li class="active"><a href="friends.html" class="waves-effect"><i class="material-icons">groups</i>Friends</a></li>
+                <li><a href="watchlist.html" class="waves-effect"><i class="material-icons darkmode-text">list</i>Watchlist</a></li>
                 <li><a href="account.html" class="waves-effect"><i class="material-icons">account_circle</i>Account</a></li>
           </ul>
 
@@ -86,11 +88,10 @@
                 function onLoad() {
                     firebase.auth().onAuthStateChanged(function(user) {
                         if (user) {
-                            
                             firebase.database().ref('Users/' + user.uid + '/Friends').on('child_added', function(data) {
-                                document.getElementById('progressbar').hidden = true;
                                 displayFriend(data.val());
                             });
+                            document.getElementById('progressbar').hidden = true;
                         } else {
                             redirect('login.html?source=' + window.location.href);
                         }

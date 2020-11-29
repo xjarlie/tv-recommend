@@ -25,12 +25,24 @@
           <ul id="slide-out" class="sidenav" id="sidenav" >
             <li><a href="index.html" class="waves-effect darkmode-text" ><i class="material-icons darkmode-text">home</i>Home</a></li>
                 <li><a href="friends.html" class="waves-effect darkmode-text" ><i class="material-icons darkmode-text" >groups</i>Friends</a></li>
-                <li><a href="watchlist.html" class="waves-effect"><i class="material-icons">list</i>Watchlist</a></li>
+                <li><a href="watchlist.html" class="waves-effect"><i class="material-icons darkmode-text">list</i>Watchlist</a></li>
                 <li><a href="account.html" class="waves-effect darkmode-text" ><i class="material-icons darkmode-text" >account_circle</i>Account</a></li>
           </ul>
           
 
         </br>
+
+        <div class="container">
+            <div class="row" id="progressbar">
+                <div class="progress">
+                    <div class="indeterminate"></div>
+                </div>
+            </div>
+
+            <ul class="collection" id="watchlist">
+                
+            </ul>
+        </div>
 
         <!-- The core Firebase JS SDK is always required and must be listed first -->
         <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-app.js"></script>
@@ -59,19 +71,30 @@
             function onLoad() {
                 firebase.auth().onAuthStateChanged(function(user) {
                     if (user) {
-                        // User is signed in.
-                        var displayName = user.displayName;
-                        var email = user.email;
-                        var emailVerified = user.emailVerified;
-                        var photoURL = user.photoURL;
-                        var isAnonymous = user.isAnonymous;
                         uid = user.uid;
-                        var providerData = user.providerData;
-                        //document.getElementById('progressbar').hidden = true;
+                        document.getElementById('progressbar').hidden = true;
+
+                        firebase.database().ref('Users/' + uid + '/Watchlist').on('child_added', function(data) {
+                            displayItem(data.val());
+                            
+                        });
                     } else {
                         redirect('login.html?source=' + window.location.href);
                     }
                 });
+                
+            }
+
+            function displayItem(postID) {
+                if (postID != 'item') {
+                    firebase.database().ref('Posts/' + postID).once('value', function(snapshot) {
+                        var item = document.createElement('a');
+                        item.href = 'post.html?id=' + postID;
+                        item.style = 'color: black;';
+                        item.innerHTML = '<li class="collection-item">' + snapshot.val().title + '</li>';
+                        document.getElementById('watchlist').appendChild(item);
+                    });
+                }
                 
             }
 

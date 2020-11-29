@@ -53,7 +53,7 @@
                         </div>
                     </div>
                     <div class="row">
-                        <a class="waves-effect btn deep-orange" id="viewUserBtn"><i class="material-icons left">open_in_new</i>View my posts</a>
+                        <a class="waves-effect btn deep-orange disabled" id="viewUserBtn"><i class="material-icons left">open_in_new</i>View my posts</a>
                     </div>
                     <div class="row">
                         <a class="waves-effect waves-light btn deep-orange disabled" onclick="resetPass()" id="resetPassBtn"><i class="material-icons left">lock</i>Reset password</a>
@@ -109,6 +109,7 @@
                             document.getElementById('emaillabel').innerHTML = user.email;
 
                             document.getElementById('viewUserBtn').href = 'user.html?id=' + user.uid;
+                            document.getElementById('viewUserBtn').classList.remove('disabled');
                         } else {
                             redirect('login.html?source=' + window.location.href);
                         }

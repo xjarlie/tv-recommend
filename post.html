@@ -49,7 +49,7 @@
                 <span class="fa fa-star" id="star-4"></span>
                 <span class="fa fa-star" id="star-5"></span>
               </div>
-              <div class="row"><p id="author" class="flow-text" style="color: darkgrey; font-weight: bold;"></p></div>
+              <div class="row"><a id="author-link"><p id="author" class="flow-text" style="color: darkgrey; font-weight: bold;"></p></a></div>
               <div class="row" id="watchlist" hidden=true>
                   <button type="button" class="waves-effect btn deep-orange" id="watchlistbtn"></button>
               </div>
@@ -130,6 +130,9 @@
                         firebase.database().ref('Users/' + snapshot.val().author + '/username').once('value', function(snapshot2) {
                             document.getElementById('author').innerHTML = snapshot2.val();
                         });
+
+                        document.getElementById('author-link').href = 'user.html?id=' + snapshot.val().author;
+
                         document.getElementById('title').innerHTML = snapshot.val().title;
                         document.getElementById('description').innerHTML = snapshot.val().description || '';
                         if (snapshot.val().source) {

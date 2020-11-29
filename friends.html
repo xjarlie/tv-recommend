@@ -81,7 +81,7 @@
 
                 function displayFriend(uid) {
                     firebase.database().ref('Users/' + uid + '/username').once('value', function(val) {
-                        document.getElementById('friendlist').innerHTML += '<li class="collection-item">' + val.val() + '</li>';
+                        document.getElementById('friendlist').innerHTML += '<a href="user.html?id=' + uid + '"><li class="collection-item">' + val.val() + '</li></a>';
                     });
                 }
                 

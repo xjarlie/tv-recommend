@@ -50,6 +50,9 @@
                 <span class="fa fa-star" id="star-5"></span>
               </div>
               <div class="row"><p id="author" class="flow-text" style="color: darkgrey; font-weight: bold;"></p></div>
+              <div class="row" id="watchlist" hidden=true>
+                  <button type="button" class="waves-effect btn deep-orange" onclick="addToWatchlist()"><i class="material-icons left">playlist_add</i>Add to watchlist</button>
+              </div>
               <div class="row"><p id="source" class="flow-text" style="font-weight: bolder;"></p></div>
               <div class="row"><p id="description" class="flow-text"></p></div>
               <div class="row" id="tags"></div>
@@ -98,6 +101,9 @@
                                     document.getElementById('delete').hidden = false;
                                 }
                             })
+                            document.getElementById('watchlist').hidden = false;
+
+                            firebase.database().ref('Users/' + uid + '/Watchlist/item').set('item');
                         } else {    
                             redirect('login.html?source=' + window.location.href);
                         }
@@ -171,6 +177,17 @@
                             });
                         }   
                     });
+                }
+
+                function addToWatchlist() {
+                    firebase.database().ref('Users/' + uid + '/Watchlist/' + postID).once('value', function(snapshot) {
+                        if (!snapshot.val()) {
+                            firebase.database().ref('Users/' + uid + '/Watchlist/' + postID).set(postID);
+                            M.toast({html: 'Added to watchlist'});
+                        } else {
+                            M.toast({html: 'Item already in watchlist'});
+                        }
+                    })
                 }
             </script>
     </body>

@@ -84,7 +84,7 @@
                     firebase.database().ref('Posts/' + data.val()).once('value', function(snapshot) {
                         var post = document.createElement('div');
                         post.classList.add('row');
-                        post.innerHTML = '<a href=post.html?id=' + postKey + ' style="color: black; font-weight: bold;"><div class="card"><div class="card-content"><span class="card-title">' + snapshot.val().title + '</span></div></div></a>';
+                        post.innerHTML = '<a href=post.html?id=' + data.val() + ' style="color: black; font-weight: bold;"><div class="card"><div class="card-content"><span class="card-title">' + snapshot.val().title + '</span></div></div></a>';
                         document.getElementById('collection').appendChild(post);
                     });
                 });

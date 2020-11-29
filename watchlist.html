@@ -91,7 +91,7 @@
                         var item = document.createElement('a');
                         item.href = 'post.html?id=' + postID;
                         item.style = 'color: black;';
-                        item.innerHTML = '<li class="collection-item">' + snapshot.val().title + '</li>';
+                        item.innerHTML = '<li class="collection-item"><div class="card"><div class="card-content"><span class="card-title">' + snapshot.val().title + '<span></div><div class="card-action"><a href="#" onclick=\'recommendItem("' + postID + '")\'>Recommend</a></div></div></li>';                       
                         document.getElementById('watchlist').appendChild(item);
                     });
                 }
@@ -102,6 +102,14 @@
                 var elems = document.querySelectorAll('.sidenav');
                 var instances = M.Sidenav.init(elems);
             });
+
+            function recommendItem(item) {
+                redirect('newpost.html?from=' + item);
+            }
+
+            function redirect(location) {
+                window.location.href = location;
+            }
         </script>
     </body>
 </html>

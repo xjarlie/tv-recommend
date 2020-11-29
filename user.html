@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="css/style.css">
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <link type="text/css" rel="stylesheet" href="css/materialize.min.css"  media="screen,projection"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    </head>
+    <body onload="onLoad()">
+        <nav class="deep-orange" style="top: 0;">
+            <div class="nav-wrapper">
+              <a href="#" class="brand-logo" id="user-display">User</a>
+              <a onclick="window.history.back()" class="sidenav-trigger"><i class="material-icons">arrow_back</i></a>
+              <ul id="nav-mobile" class="right hide-on-med-and-down">
+                <li><a href="index.html" class="waves-effect"><i class="material-icons">home</i>Home</a></li>
+                <li><a href="friends.html" class="waves-effect"><i class="material-icons">groups</i>Friends</a></li>
+                <li><a href="account.html" class="waves-effect"><i class="material-icons">account_circle</i>Account</a></li>
+                
+              </ul>
+            </div>
+        </nav>
+          <ul id="slide-out" class="sidenav">
+                <li><a href="index.html" class="waves-effect"><i class="material-icons">home</i>Home</a></li>
+                <li><a href="friends.html" class="waves-effect"><i class="material-icons">groups</i>Friends</a></li>
+                <li><a href="account.html" class="waves-effect"><i class="material-icons">account_circle</i>Account</a></li>
+          </ul>
+
+        </br>
+        <div class="container" id="collection">
+            <div class="row" id="progressbar">
+                <div class="progress">
+                    <div class="indeterminate"></div>
+                </div>
+            </div>
+
+        </div>
+
+        <script src="jquery.min.js"></script>
+        <!-- The core Firebase JS SDK is always required and must be listed first -->
+        <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-app.js"></script>
+
+        <!-- TODO: Add SDKs for Firebase products that you want to use
+            https://firebase.google.com/docs/web/setup#available-libraries -->
+            <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-auth.js"></script>
+            <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-database.js"></script>
+
+            <script type="text/javascript" src="js/materialize.min.js"></script>
+        
+        <script>
+            var firebaseConfig = {
+                apiKey: "AIzaSyDoxnxXrZrkmvwxqvGOd0HKxwMJgLHum_I",
+                authDomain: "lwttv-8fcd8.firebaseapp.com",
+                databaseURL: "https://lwttv-8fcd8.firebaseio.com",
+                projectId: "lwttv-8fcd8",
+                storageBucket: "lwttv-8fcd8.appspot.com",
+                messagingSenderId: "326986084837",
+                appId: "1:326986084837:web:56b983ce9bab9e397f7f0c"
+            };
+            // Initialize Firebase
+            firebase.initializeApp(firebaseConfig);
+
+            var userID;
+            function onLoad() {
+                userID = window.location.search.split('?id=')[1];
+
+                firebase.auth().onAuthStateChanged(function(user) {
+                    if (user) {
+                        
+                        firebase.database().ref('Users/' + userID + '/username').once('value', function(snapshot) {
+                            document.getElementById('user-display').innerHTML = snapshot.val() + "'s Posts";
+                        });
+
+                        displayPosts();
+                        document.getElementById('progressbar').hidden = true;
+                    } else {
+                        redirect('login.html?source=' + window.location.href);
+                    }
+                });
+            }
+
+            function displayPosts() {
+                firebase.database().ref('Users/' + userID + '/Posts').on('child_added', function(data) {
+                    var postKey = data.key;
+                    firebase.database().ref('Posts/' + data.val()).once('value', function(snapshot) {
+                        var post = document.createElement('div');
+                        post.classList.add('row');
+                        post.innerHTML = '<a href=post.html?id=' + postKey + ' style="color: black; font-weight: bold;"><div class="card"><div class="card-content"><span class="card-title">' + snapshot.val().title + '</span></div></div></a>';
+                        document.getElementById('collection').appendChild(post);
+                    });
+                });
+            }
+        </script>
+    </body>
+</html>

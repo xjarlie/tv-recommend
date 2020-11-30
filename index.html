@@ -133,7 +133,7 @@
                     console.log(post);
                     var card = document.createElement('div');
                     card.classList.add('row');
-                    card.innerHTML = '<a href=post.html?id=' + postKey + ' style="color: black; font-weight: bold;"><div class="card"><div class="card-content"><span class="card-title">' + post.title + '</span><p>' + username + '</p></div></div></a>';
+                    card.innerHTML = '<a href=post.html?id=' + postKey + ' style="color: black; font-weight: bold;"><div class="card"><div class="card-content"><span class="card-title" style="font-weight: bold;">' + post.title + '</span><p class="deep-orange-text">' + username + '</p></div></div></a>';
                     document.getElementById('collection').appendChild(card);
                 });
             }

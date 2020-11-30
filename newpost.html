@@ -219,7 +219,7 @@
                     var source = document.getElementById('source').value || '';
                     var tags = [];
                     tagsNodeList.forEach(function(item, index) {
-                        var inner = item.textContent;
+                        var inner = item.textContent.toLowerCase();
                         var tag;
                         if (inner.includes('close')) {
                             tag = inner.split('close')[0];

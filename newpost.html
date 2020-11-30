@@ -109,7 +109,7 @@
                     </div>
                     <div class="row">
                         <label>Descriptor tags (Optional)</label>
-                        <div class="chips" id="descriptors">
+                        <div class="chips chips-initial input-field" id="descriptors">
                             
                         </div>
                     </div>
@@ -159,13 +159,24 @@
                             if (fromID) {
                                 firebase.database().ref('Posts/' + fromID).once('value', function(snapshot) {
                                     document.getElementById('title').value = snapshot.val().title;
+                                    if (snapshot.val().tags) {
+                                        snapshot.val().tags.forEach(function(tag) {
+                                            var chip = document.createElement('div');
+                                            chip.classList.add('chip');
+                                            chip.innerHTML = tag + '<i class="close material-icons">close</i>';
+                                            chip.tabIndex = 0;
+                                            document.getElementById('descriptors').prepend(chip);
+                                        })
+                                    }
                                     M.updateTextFields();
+                                }).then(function() {
+                                    document.getElementById('descriptors').getElementsByTagName('')
                                 })
                             }
                         } else {
                         
                         }
-                    });
+                    });                    
                 }
                 var rating;
                 $(document).ready(function(){
@@ -208,7 +219,7 @@
                     var source = document.getElementById('source').value || '';
                     var tags = [];
                     tagsNodeList.forEach(function(item, index) {
-                        var inner = item.textContent;
+                        var inner = item.textContent.toLowerCase();
                         var tag;
                         if (inner.includes('close')) {
                             tag = inner.split('close')[0];
@@ -244,6 +255,38 @@
                         document.getElementById('recommendBtn').classList.remove('disabled');
                     }
                 }
+
+                
+                
+
+
+                // Select the node that will be observed for mutations
+                const targetNode = document.getElementById('descriptors');
+
+                // Options for the observer (which mutations to observe)
+                const config = { attributes: true, childList: true, subtree: true };
+
+                // Callback function to execute when mutations are observed
+                const callback = function(mutationsList, observer) {
+                    // Use traditional 'for loops' for IE 11
+                    for(const mutation of mutationsList) {
+                        if (mutation.type === 'childList') {                           
+                            var chipArray = Array.from(document.getElementsByClassName('chip'))
+                            chipArray.forEach(function(chip) {
+                                console.log(chip);
+                                chip.onclick = function() {
+                                    redirect('tag.html?tag=' + chip.innerHTML.split('<i')[0].toLowerCase());
+                                };
+                            });
+                        }
+                    }
+                };  
+
+                // Create an observer instance linked to the callback function
+                const observer = new MutationObserver(callback);
+
+                // Start observing the target node for configured mutations
+                observer.observe(targetNode, config);
             </script>
     </body>
 </html>

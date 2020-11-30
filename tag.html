@@ -10,7 +10,7 @@
     <body onload="onLoad()">
         <nav class="deep-orange" style="top: 0;">
             <div class="nav-wrapper">
-              <a href="#" class="brand-logo" id="user-display">User</a>
+              <a href="#" class="brand-logo truncate" id="tag-display">Tag: </a>
               <a onclick="window.history.back()" class="sidenav-trigger"><i class="material-icons">arrow_back</i></a>
               <ul id="nav-mobile" class="right hide-on-med-and-down">
                 <li><a href="index.html" class="waves-effect"><i class="material-icons">home</i>Home</a></li>
@@ -46,7 +46,7 @@
             <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-database.js"></script>
 
             <script type="text/javascript" src="js/materialize.min.js"></script>
-        
+
         <script>
             var firebaseConfig = {
                 apiKey: "AIzaSyDoxnxXrZrkmvwxqvGOd0HKxwMJgLHum_I",
@@ -60,17 +60,15 @@
             // Initialize Firebase
             firebase.initializeApp(firebaseConfig);
 
-            var userID;
+            var tag;
+            var uid;
             function onLoad() {
-                userID = window.location.search.split('?id=')[1];
+                tag = window.location.search.split('?tag=')[1];
+                document.getElementById('tag-display').innerHTML = 'Tag: ' + tag;
 
                 firebase.auth().onAuthStateChanged(function(user) {
                     if (user) {
-                        
-                        firebase.database().ref('Users/' + userID + '/username').once('value', function(snapshot) {
-                            document.getElementById('user-display').innerHTML = snapshot.val() + "'s Posts";
-                        });
-
+                        uid = user.uid;
                         displayPosts();
                         document.getElementById('progressbar').hidden = true;
                     } else {
@@ -80,14 +78,38 @@
             }
 
             function displayPosts() {
-                firebase.database().ref('Users/' + userID + '/Posts').on('child_added', function(data) {
-                    var postKey = data.key;
-                    firebase.database().ref('Posts/' + data.val()).once('value', function(snapshot) {
-                        var post = document.createElement('div');
-                        post.classList.add('row');
-                        post.innerHTML = '<a href=post.html?id=' + data.val() + ' style="color: black; font-weight: bold;"><div class="card"><div class="card-content"><span class="card-title">' + snapshot.val().title + '</span></div></div></a>';
-                        document.getElementById('collection').appendChild(post);
+                firebase.database().ref('Users/' + uid + '/Friends').on('child_added', function(data) {
+                    firebase.database().ref('Users/' + data.val() + '/Posts').on('child_added', function(val) {
+                        var postKey = val.val();
+                        firebase.database().ref('Posts/' + val.val()).once('value', function(snapshot) {
+                            console.log(snapshot.val().tags);
+                            console.log(tag);
+                            if (snapshot.val().tags.includes(tag)) {
+                                postToCard(snapshot.val(), postKey);
+                            }   
+                        })
                     });
+                });
+                firebase.database().ref('Users/' + uid + '/Posts').on('child_added', function(data) {
+                    var postKey = data.val();
+                    firebase.database().ref('Posts/' + postKey).once('value', function(snapshot) {
+                        if (snapshot.val().tags.includes(tag)) {
+                            postToCard(snapshot.val(), postKey);
+                        }
+                    });
+                });
+            }
+
+            function postToCard(post, postKey) {
+                firebase.database().ref('Users/' + post.author + '/username').once('value', function(snapshot) {
+                    
+                    username = snapshot.val();
+                    console.log(username);
+                    console.log(post);
+                    var card = document.createElement('div');
+                    card.classList.add('row');
+                    card.innerHTML = '<a href=post.html?id=' + postKey + ' style="color: black; font-weight: bold;"><div class="card"><div class="card-content"><span class="card-title">' + post.title + '</span><p>' + username + '</p></div></div></a>';
+                    document.getElementById('collection').appendChild(card);
                 });
             }
         </script>

@@ -146,11 +146,18 @@
 
                         if (snapshot.val().tags) {
                             snapshot.val().tags.forEach(function(tag) {
-                            var chip = document.createElement('div');
-                            chip.classList = 'chip';
-                            chip.innerHTML = tag;
-                            document.getElementById('tags').appendChild(chip);
-                        });
+                                var chip = document.createElement('div');
+                                chip.classList = 'chip';
+                                chip.innerHTML = tag;
+                                document.getElementById('tags').appendChild(chip);
+                            });
+                            var chipArray = Array.from(document.getElementsByClassName('chip'))
+                            chipArray.forEach(function(chip) {
+                                console.log(chip);
+                                chip.onclick = function() {
+                                    redirect('tag.html?tag=' + chip.innerHTML.split('<i')[0].toLowerCase());
+                                };
+                            });
                         }
                         if (snapshot.val().rating) {
                             document.getElementById('rating').hidden = false;

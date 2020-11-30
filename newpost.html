@@ -165,16 +165,18 @@
                                             chip.classList.add('chip');
                                             chip.innerHTML = tag + '<i class="close material-icons">close</i>';
                                             chip.tabIndex = 0;
-                                            document.getElementById('descriptors').appendChild(chip);
+                                            document.getElementById('descriptors').prepend(chip);
                                         })
                                     }
                                     M.updateTextFields();
+                                }).then(function() {
+                                    document.getElementById('descriptors').getElementsByTagName('')
                                 })
                             }
                         } else {
                         
                         }
-                    });
+                    });                    
                 }
                 var rating;
                 $(document).ready(function(){
@@ -253,6 +255,38 @@
                         document.getElementById('recommendBtn').classList.remove('disabled');
                     }
                 }
+
+                
+                
+
+
+                // Select the node that will be observed for mutations
+                const targetNode = document.getElementById('descriptors');
+
+                // Options for the observer (which mutations to observe)
+                const config = { attributes: true, childList: true, subtree: true };
+
+                // Callback function to execute when mutations are observed
+                const callback = function(mutationsList, observer) {
+                    // Use traditional 'for loops' for IE 11
+                    for(const mutation of mutationsList) {
+                        if (mutation.type === 'childList') {                           
+                            var chipArray = Array.from(document.getElementsByClassName('chip'))
+                            chipArray.forEach(function(chip) {
+                                console.log(chip);
+                                chip.onclick = function() {
+                                    redirect('tag.html?tag=' + chip.innerHTML.split('<i')[0].toLowerCase());
+                                };
+                            });
+                        }
+                    }
+                };  
+
+                // Create an observer instance linked to the callback function
+                const observer = new MutationObserver(callback);
+
+                // Start observing the target node for configured mutations
+                observer.observe(targetNode, config);
             </script>
     </body>
 </html>

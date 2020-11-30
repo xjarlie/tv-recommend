@@ -109,7 +109,7 @@
                     </div>
                     <div class="row">
                         <label>Descriptor tags (Optional)</label>
-                        <div class="chips" id="descriptors">
+                        <div class="chips chips-initial input-field" id="descriptors">
                             
                         </div>
                     </div>
@@ -159,6 +159,15 @@
                             if (fromID) {
                                 firebase.database().ref('Posts/' + fromID).once('value', function(snapshot) {
                                     document.getElementById('title').value = snapshot.val().title;
+                                    if (snapshot.val().tags) {
+                                        snapshot.val().tags.forEach(function(tag) {
+                                            var chip = document.createElement('div');
+                                            chip.classList.add('chip');
+                                            chip.innerHTML = tag + '<i class="close material-icons">close</i>';
+                                            chip.tabIndex = 0;
+                                            document.getElementById('descriptors').appendChild(chip);
+                                        })
+                                    }
                                     M.updateTextFields();
                                 })
                             }

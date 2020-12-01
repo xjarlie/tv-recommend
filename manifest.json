@@ -1,8 +1,8 @@
 {
     "dir": "ltr",
     "lang": "en",
-    "name": "Home   WhatsOn",
-    "short_name": "Home   WhatsOn",
+    "name": "WhatsOn",
+    "short_name": "WhatsOn",
     "scope": "/",
     "display": "browser",
     "start_url": "https://tv.xjarlie.com/",

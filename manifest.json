@@ -1,0 +1,18 @@
+{
+    "dir": "ltr",
+    "lang": "en",
+    "name": "Home   WhatsOn",
+    "short_name": "Home   WhatsOn",
+    "scope": "/",
+    "display": "browser",
+    "start_url": "https://tv.xjarlie.com/",
+    "background_color": "#000000",
+    "theme_color": "transparent",
+    "description": "",
+    "orientation": "any",
+    "related_applications": [],
+    "prefer_related_applications": false,
+    "icons": [],
+    "url": "https://tv.xjarlie.com",
+    "screenshots": []
+}

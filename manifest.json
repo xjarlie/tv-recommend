@@ -5,7 +5,7 @@
     "short_name": "WhatsOn",
     "scope": "/",
     "display": "standalone",
-    "start_url": "https://tv.xjarlie.com/",
+    "start_url": "https://dev.tv.xjarlie.com/",
     "background_color": "#000000",
     "theme_color": "transparent",
     "description": "",

@@ -51,6 +51,7 @@
                 <span class="fa fa-star" id="star-5"></span>
               </div>
               <div class="row"><a id="author-link"><p id="author" class="flow-text" style="color: darkgrey; font-weight: bold;"></p></a></div>
+              
               <div class="row" id="watchlist" hidden=true>
                   <button type="button" class="waves-effect btn deep-orange" id="watchlistbtn"></button>
               </div>
@@ -60,7 +61,9 @@
               <div class="row" id="watchrow" hidden=true>
                   <a class="waves-effect btn deep-orange" id="wheretowatch"><i class="material-icons left">open_in_new</i>Where to watch</a>
               </div>
-              
+              <div class="row" id="recommend" hidden="true">
+                <button type="button" class="waves-effect btn deep-orange" id="recommendbtn" onclick="recommend()">recommend</button>
+              </div>
               <div class="row" hidden=true id="delete">
                   <button class="btn waves-effect red darken-4" type="button" onclick="deletePost()"><i class="material-icons left">delete</i>Delete Post</button>
               </div>
@@ -106,6 +109,8 @@
                             firebase.database().ref('Posts/' + postID + '/author').once('value', function(snapshot) {
                                 if (snapshot.val() == uid) {
                                     document.getElementById('delete').hidden = false;
+                                } else {
+                                    document.getElementById('recommend').hidden = false;
                                 }
                             })
 
@@ -170,6 +175,7 @@
                             }
                         }
                         document.getElementById('progressbar').hidden = true;
+                        
                     });
 
                 }
@@ -225,6 +231,10 @@
 
                     watchlistBtn.innerHTML = '<i class="material-icons left">playlist_add</i>Add to watchlist';
                     watchlistBtn.onclick = function() {addToWatchlist()};
+                }
+
+                function recommend() {
+                    redirect('newpost.html?from=' + postID);
                 }
             </script>
     </body>

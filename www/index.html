@@ -45,6 +45,10 @@
                     <div class="indeterminate"></div>
                 </div>
             </div>
+            <div class="row center-align" id="nothing">
+                <h5>Nothing here</h5>
+                <h6>Start by creating a post using the + button</h6>
+            </div>
             
         </div>
 
@@ -141,6 +145,7 @@
                     card.classList.add('row');
                     card.innerHTML = '<a href=post.html?id=' + postKey + ' style="color: black; font-weight: bold;"><div class="card"><div class="card-content"><span class="card-title" style="font-weight: bold;">' + post.title + '</span><p class="deep-orange-text">' + username + '</p></div></div></a>';
                     document.getElementById('collection').appendChild(card);
+                    document.getElementById('nothing').hidden = true;
                 });
             }
 

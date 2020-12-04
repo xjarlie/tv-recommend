@@ -69,7 +69,7 @@
                     if (user) {
                         
                         firebase.database().ref('Users/' + userID + '/username').once('value', function(snapshot) {
-                            document.getElementById('user-display').innerHTML = snapshot.val() + "'s Posts";
+                            document.getElementById('user-display').innerHTML = snapshot.val();
                         });
 
                         displayPosts();

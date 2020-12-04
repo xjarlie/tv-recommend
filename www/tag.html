@@ -64,7 +64,7 @@
             var tag;
             var uid;
             function onLoad() {
-                tag = window.location.search.split('?tag=')[1];
+                tag = decodeURI(window.location.search.split('?tag=')[1]);
                 document.getElementById('tag-display').innerHTML = 'Tag: ' + tag;
 
                 firebase.auth().onAuthStateChanged(function(user) {

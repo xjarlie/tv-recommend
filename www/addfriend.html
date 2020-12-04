@@ -28,7 +28,7 @@
             <li><a href="account.html" class="waves-effect"><i class="material-icons">account_circle</i>Account</a></li>
         </ul>
     </br>
-        <div id="qrcode" style="margin: auto;">
+        <div id="qrcode" style="margin: auto; width: 50%; padding: 10px;">
             <div class="preloader-wrapper big active">
                 <div class="spinner-layer spinner-blue">
                   <div class="circle-clipper left">
@@ -126,21 +126,27 @@
                         uid = user.uid;
                         var providerData = user.providerData;
                         // ...
+
+
                         if (window.location.search) {
-                        var friendID = window.location.search.split('?friend=')[1];
-                        firebase.database().ref('Users/' + uid + '/Friends').push(friendID).then(function() {
-                            firebase.database().ref('Users/' + friendID + '/Friends').push(uid).then(function() {
-                              redirect('friends.html');
+                            var friendID = window.location.search.split('?friend=')[1];
+                            firebase.database().ref('Users/' + uid + '/Friends/' + friendID).once('value', function(snapshot) {
+                                if (snapshot.val()) {
+                                  redirect('friends.html');
+                                } else {
+                                  firebase.database().ref('Users/' + uid + '/Friends/' + friendID).set(friendID);
+                                  firebase.database().ref('Users/' + friendID + '/Friends/' + uid).set(uid);
+                                  redirect('friends.html');
+                                }
                             });
-                        });
                         
 
-                    } else {
-                        document.getElementById('qrcode').innerHTML = '';
-                        var url = "https://tv.xjarlie.com/addfriend.html?friend=" + uid;
-                        new QRCode(document.getElementById("qrcode"), url);
-                        document.getElementById('linkdisplay').innerHTML = url;
-                    }
+                        } else {
+                            document.getElementById('qrcode').innerHTML = '';
+                            var url = "https://tv.xjarlie.com/addfriend.html?friend=" + uid;
+                            new QRCode(document.getElementById("qrcode"), url);
+                            document.getElementById('linkdisplay').innerHTML = url;
+                        }
                     } else {
                         redirect('login.html?source=' + window.location.href);
                     }

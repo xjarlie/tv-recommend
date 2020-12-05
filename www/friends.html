@@ -89,6 +89,7 @@
                 function displayFriend(uid) {
                     firebase.database().ref('Users/' + uid + '/username').once('value', function(val) {
                         document.getElementById('friendlist').innerHTML += '<a href="user.html?id=' + uid + '"><li class="collection-item">' + val.val() + '</li></a>';
+                        document.getElementById('nothing').hidden = true;
                     });
                 }
                 
@@ -98,6 +99,7 @@
                             firebase.database().ref('Users/' + user.uid + '/Friends').on('child_added', function(data) {
                                 displayFriend(data.val());
                             });
+                            
                             document.getElementById('progressbar').hidden = true;
                         } else {
                             redirect('login.html?source=' + window.location.href);

@@ -90,6 +90,7 @@
             }
 
             function displayItem(postID) {
+                document.getElementById('nothing').hidden = true;
                 if (postID != 'item') {
                     firebase.database().ref('Posts/' + postID).once('value', function(snapshot) {
                         var item = document.createElement('a');

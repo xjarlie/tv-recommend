@@ -113,6 +113,9 @@
                 });
                 }
                 
+                firebase.database().ref('Users/' + uid + '/Friends').once('value', function(snapshot) {
+                    sessionStorage.setItem('friends', JSON.stringify(snapshot.val()));
+                });
             }
 
             function load() {

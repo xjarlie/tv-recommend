@@ -13,6 +13,8 @@
   color: orange;
 }
         </style>
+
+        <script>uid = JSON.parse(sessionStorage.getItem('user')).uid || '';</script>
     </head>
     <body onload="onLoad()">
         <nav class="deep-orange" style="top: 0;">
@@ -95,7 +97,7 @@
                 // Initialize Firebase
                 firebase.initializeApp(firebaseConfig);
 
-                var postID = window.location.search.split('?id=')[1];
+                var postID; 
                 var uid;
                 var watchlistBtn = document.getElementById('watchlistbtn');
                 var watchlistRow = document.getElementById('watchlist');
@@ -103,20 +105,21 @@
                 function onLoad() {
                     if (sessionStorage.getItem('user')) {
                         uid = JSON.parse(sessionStorage.getItem('user')).uid;
+                        postID = window.location.search.split('?id=')[1]; 
 
                         firebase.database().ref('Posts/' + postID + '/author').once('value', function(snapshot) {
+                            console.log(snapshot);
                             if (snapshot.val() == uid) {
                                 document.getElementById('delete').hidden = false;
                             } else {
                                 document.getElementById('recommend').hidden = false;
                             }
-                        })
+                        });
 
                         document.getElementById('watchrow').hidden = false;
 
                         firebase.database().ref('Users/' + uid + '/Watchlist/' + postID).once('value', function(snapshot) {
                             document.getElementById('watchlist').hidden = false;
-                                
                             if (snapshot.val()) {
                                 watchlistBtn.innerHTML = '<i class="material-icons left">remove_circle_outline</i>Remove from watchlist';
                                 watchlistBtn.onclick = function() {removeFromWatchlist()};
@@ -278,6 +281,7 @@
                             firebase.database().ref('Users/' + uid + '/Posts').on('child_added', function(data) {
                                 if (data.val() == postID) {
                                     firebase.database().ref('Users/' + uid + '/Posts/' + data.key).set(null);
+                                    sessionStorage.setItem('posts', '');
                                     redirect('index.html');
                                 }
                             });

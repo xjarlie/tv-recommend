@@ -231,6 +231,9 @@
                     });
 
                     if (title && rating) {
+                        var username;
+                        firebase.database().ref('Users/' + firebase.auth().currentUser.uid + '/username').once('value', function(snapshot) {
+                        username = snapshot.val();
                         var userID = firebase.auth().currentUser.uid;
                         var ref = firebase.database().ref('Posts').push();
                         ref.set({
@@ -239,7 +242,8 @@
                             tags: tags,
                             author: userID,
                             source: source,
-                            rating: rating
+                            rating: rating,
+                            authorname: username
                         }).then(function() {
                             firebase.database().ref('Users/' + userID + '/Posts').push(ref.key).then(function() {
                                 if (fromID) {
@@ -249,7 +253,7 @@
                                 redirect('index.html');
                             });
                         });
-
+                        });
 
                     } else {
                         alert('Please enter title and rating');

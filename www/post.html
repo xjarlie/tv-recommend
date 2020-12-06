@@ -101,39 +101,107 @@
                 var watchlistRow = document.getElementById('watchlist');
                 
                 function onLoad() {
-                    firebase.auth().onAuthStateChanged(function(user) {
-                        if (user) {
-                            uid = user.uid;
+                    if (sessionStorage.getItem('user')) {
+                        uid = JSON.parse(sessionStorage.getItem('user')).uid;
 
-                            
-                            firebase.database().ref('Posts/' + postID + '/author').once('value', function(snapshot) {
-                                if (snapshot.val() == uid) {
-                                    document.getElementById('delete').hidden = false;
-                                } else {
-                                    document.getElementById('recommend').hidden = false;
-                                }
-                            })
+                        firebase.database().ref('Posts/' + postID + '/author').once('value', function(snapshot) {
+                            if (snapshot.val() == uid) {
+                                document.getElementById('delete').hidden = false;
+                            } else {
+                                document.getElementById('recommend').hidden = false;
+                            }
+                        })
 
-                            document.getElementById('watchrow').hidden = false;
+                        document.getElementById('watchrow').hidden = false;
 
-                            firebase.database().ref('Users/' + uid + '/Watchlist/' + postID).once('value', function(snapshot) {
-                                document.getElementById('watchlist').hidden = false;
+                        firebase.database().ref('Users/' + uid + '/Watchlist/' + postID).once('value', function(snapshot) {
+                            document.getElementById('watchlist').hidden = false;
                                 
-                                if (snapshot.val()) {
-                                    watchlistBtn.innerHTML = '<i class="material-icons left">remove_circle_outline</i>Remove from watchlist';
-                                    watchlistBtn.onclick = function() {removeFromWatchlist()};
-                                } else {
-                                    watchlistBtn.innerHTML = '<i class="material-icons left">playlist_add</i>Add to watchlist';
-                                    watchlistBtn.onclick = function() {addToWatchlist()};
-                                }
-                            })
+                            if (snapshot.val()) {
+                                watchlistBtn.innerHTML = '<i class="material-icons left">remove_circle_outline</i>Remove from watchlist';
+                                watchlistBtn.onclick = function() {removeFromWatchlist()};
+                            } else {
+                                watchlistBtn.innerHTML = '<i class="material-icons left">playlist_add</i>Add to watchlist';
+                                watchlistBtn.onclick = function() {addToWatchlist()};
+                            }
+                            document.getElementById('progressbar').hidden = true;
+                        })
                             
 
-                            firebase.database().ref('Users/' + uid + '/Watchlist/item').set('item');
-                        } else {    
-                            redirect('login.html?source=' + window.location.href);
+                        firebase.database().ref('Users/' + uid + '/Watchlist/item').set('item');
+                        
+                    } else {
+                        firebase.auth().onAuthStateChanged(function(user) {
+                            if (user) {
+                                uid = user.uid;
+
+                                firebase.database().ref('Posts/' + postID + '/author').once('value', function(snapshot) {
+                                    if (snapshot.val() == uid) {
+                                        document.getElementById('delete').hidden = false;
+                                    } else {
+                                        document.getElementById('recommend').hidden = false;
+                                    }
+                                })
+
+                                document.getElementById('watchrow').hidden = false;
+
+                                firebase.database().ref('Users/' + uid + '/Watchlist/' + postID).once('value', function(snapshot) {
+                                    document.getElementById('watchlist').hidden = false;
+                                
+                                    if (snapshot.val()) {
+                                        watchlistBtn.innerHTML = '<i class="material-icons left">remove_circle_outline</i>Remove from watchlist';
+                                        watchlistBtn.onclick = function() {removeFromWatchlist()};
+                                    } else {
+                                        watchlistBtn.innerHTML = '<i class="material-icons left">playlist_add</i>Add to watchlist';
+                                        watchlistBtn.onclick = function() {addToWatchlist()};
+                                    }
+                                })
+                            
+
+                                firebase.database().ref('Users/' + uid + '/Watchlist/item').set('item');
+                                document.getElementById('progressbar').hidden = true;
+                            } else {    
+                                redirect('login.html?source=' + window.location.href);
+                            }
+                        });
+                    }
+
+                    if (sessionStorage.getItem('activepost')) {
+                        var post = JSON.parse(sessionStorage.getItem('activepost'));
+                        
+                        document.getElementById('title').innerHTML = post.title;
+                        document.getElementById('author').innerHTML = post.authorname;
+                        document.getElementById('author-link').href = 'user.html?id=' + post.author;
+                        document.getElementById('wheretowatch').href = 'https://justwatch.com/uk/search?q=' + post.title;
+                        document.getElementById('source').innerHTML = 'Watched On: ' + post.source || '';
+                        document.getElementById('description').innerHTML = post.description || '';
+
+                        if (post.tags) {
+                            post.tags.forEach(function(tag) {
+                            var chip = document.createElement('div');
+                            chip.classList = 'chip';
+                            chip.innerHTML = tag;
+                            document.getElementById('tags').appendChild(chip);
+                        });
+                        var chipArray = Array.from(document.getElementsByClassName('chip'))
+                        chipArray.forEach(function(chip) {
+                            console.log(chip);
+                            chip.onclick = function() {
+                                redirect('tag.html?tag=' + chip.innerHTML.split('<i')[0].toLowerCase());
+                            };
+                        });
+                        document.getElementById('rating').hidden = false;
+                        var rating = post.rating;
+                        var i = 1;
+                        while (i <= rating) {
+                            document.getElementById('star-' + i).classList += ' checked';
+                            i++;
                         }
-                    });
+                        }
+                        
+                    } else {
+
+                    
 
                     var postID = window.location.search.split('?id=')[1];
                     firebase.database().ref('Posts/' + postID).once('value', function(snapshot) {
@@ -177,7 +245,7 @@
                         document.getElementById('progressbar').hidden = true;
                         
                     });
-
+                    }
                 }
 
                 function redirect(location) {

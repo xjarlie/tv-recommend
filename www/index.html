@@ -88,25 +88,36 @@
             firebase.initializeApp(firebaseConfig);
             var uid;
             function onLoad() {
-                firebase.auth().onAuthStateChanged(function(user) {
-                    if (user) {
-                        // User is signed in.
-                        var displayName = user.displayName;
-                        var email = user.email;
-                        var emailVerified = user.emailVerified;
-                        var photoURL = user.photoURL;
-                        var isAnonymous = user.isAnonymous;
-                        uid = user.uid;
-                        var providerData = user.providerData;
-                        // ...
+                if (sessionStorage.user) {
+                    uid = JSON.parse(sessionStorage.getItem('user')).uid;
+                    load();
+                } else {
+                    firebase.auth().onAuthStateChanged(function(user) {
+                        if (user) {
+                            console.log('authuser');
+                            // User is signed in.
+                            var displayName = user.displayName;
+                            var email = user.email;
+                            var emailVerified = user.emailVerified;
+                            var photoURL = user.photoURL;
+                            var isAnonymous = user.isAnonymous;
+                            uid = user.uid;
+                            var providerData = user.providerData;
+                            // ...
+                            sessionStorage.setItem('user', JSON.stringify(user));
                         
-                        displayPosts();
-                        document.getElementById('progressbar').hidden = true;
+                            load();
                     } else {
                         redirect('login.html?source=' + window.location.href);
                     }
                 });
+                }
                 
+            }
+
+            function load() {
+                displayPosts();
+                document.getElementById('progressbar').hidden = true;
             }
 
             function redirect(location) {
@@ -119,39 +130,83 @@
             });
 
             function displayPosts() {
+                var posts = JSON.parse(sessionStorage.getItem('posts') || '[]');
+
+
+                posts.forEach(element => {
+                    console.log('posts.foreach');
+                    postToCard(element.post, element.key);
+                });
+
                 firebase.database().ref('Users/' + uid + '/Friends').on('child_added', function(data) {
                     firebase.database().ref('Users/' + data.val() + '/Posts').on('child_added', function(val) {
                         var postKey = val.val();
-                        firebase.database().ref('Posts/' + val.val()).once('value', function(snapshot) {
-                            postToCard(snapshot.val(), postKey);
+                        firebase.database().ref('Posts/' + postKey).once('value', function(snapshot) {
+                            if (search(postKey, posts)) {
+                            } else {
+                                var parsed = JSON.parse(sessionStorage.getItem('posts') || '[]');
+                                parsed.push({key: postKey, post: snapshot.val()});
+                                sessionStorage.setItem('posts', JSON.stringify(parsed));
+
+                                postToCard(snapshot.val(), postKey);
+                            }
                         })
                     });
                 });
                 firebase.database().ref('Users/' + uid + '/Posts').on('child_added', function(data) {
                     var postKey = data.val();
                     firebase.database().ref('Posts/' + postKey).once('value', function(snapshot) {
-                        postToCard(snapshot.val(), postKey);
+                        if (search(postKey, posts)) {
+                            } else {
+                                var parsed = JSON.parse(sessionStorage.getItem('posts') || '[]');
+                                parsed.push({key: postKey, post: snapshot.val()});
+                                sessionStorage.setItem('posts', JSON.stringify(parsed));
+
+                                postToCard(snapshot.val(), postKey);
+                            }
                     });
                 });
             }
 
             function postToCard(post, postKey) {
-                firebase.database().ref('Users/' + post.author + '/username').once('value', function(snapshot) {
-                    
-                    username = snapshot.val();
-                    console.log(username);
-                    console.log(post);
-                    var card = document.createElement('div');
-                    card.classList.add('row');
-                    card.innerHTML = '<a href=post.html?id=' + postKey + ' style="color: black; font-weight: bold;"><div class="card"><div class="card-content"><span class="card-title" style="font-weight: bold;">' + post.title + '</span><p class="deep-orange-text">' + username + '</p></div></div></a>';
-                    document.getElementById('collection').appendChild(card);
-                    document.getElementById('nothing').hidden = true;
+                var username = post.authorname;
+                console.log('username got');
+                var card = document.createElement('div');
+                card.classList.add('row');
+                card.innerHTML = '<a href=# style="color: black; font-weight: bold;" onclick="openPost(\'' + postKey + '\')"><div class="card"><div class="card-content"><span class="card-title" style="font-weight: bold;">' + post.title + '</span><p class="deep-orange-text">' + username + '</p></div></div></a>';
+                document.getElementById('collection').prepend(card);
+                document.getElementById('nothing').hidden = true;
+            }
+
+            function search(key, array) {
+                for (var i=0; i < array.length; i++) {
+                    if (array[i].key == key) {
+                        return array[i];
+                    }
+                }
+            }
+
+            function openPost(key) {
+                document.getElementById('progressbar').hidden = false;
+                firebase.database().ref('Posts/' + key).once('value', function(snapshot) {
+                    sessionStorage.setItem('activepost', JSON.stringify(snapshot.val()));
+                    redirect('post.html?id=' + key);
                 });
             }
 
             function darken() {
                 document.getElementById('body').style.backgroundColor = '#121212';
                 document.getElementById('nav', 'fab').classList.add('darken-3');
+            }
+
+
+            function addUsernameToPosts() {
+                firebase.database().ref('Posts').on('child_added', function(data) {
+                    var key = data.key;
+                    firebase.database().ref('Users/' + data.val().author + '/username').once('value', function(snapshot) {
+                        firebase.database().ref('Posts/' + key + '/authorname').set(snapshot.val());
+                    });
+                })
             }
         </script>
 

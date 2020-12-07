@@ -106,6 +106,16 @@
                         }
                     });
                 }
+
+                function addUsernameToFriends() {
+                    firebase.database().ref('Users').on('child_added', function(data) {
+                        firebase.database().ref('Users/' + data.key + '/Friends').on('child_added', function(friend) {
+                            firebase.database().ref('Users/' + friend + '/username').once('value', function(snapshot) {
+                                
+                            })
+                        });
+                    });
+                }
             </script>
     </body>
 </html>

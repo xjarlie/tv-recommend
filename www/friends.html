@@ -86,33 +86,53 @@
                     window.location.href = location;
                 }
 
-                function displayFriend(uid) {
-                    firebase.database().ref('Users/' + uid + '/username').once('value', function(val) {
-                        document.getElementById('friendlist').innerHTML += '<a href="user.html?id=' + uid + '"><li class="collection-item">' + val.val() + '</li></a>';
-                        document.getElementById('nothing').hidden = true;
-                    });
+                function displayFriend(uid, name) {
+                    document.getElementById('friendlist').innerHTML += '<a href="user.html?id=' + uid + '"><li class="collection-item">' + name + '</li></a>';
+                    document.getElementById('nothing').hidden = true;
                 }
                 
                 function onLoad() {
-                    firebase.auth().onAuthStateChanged(function(user) {
-                        if (user) {
-                            firebase.database().ref('Users/' + user.uid + '/Friends').on('child_added', function(data) {
-                                displayFriend(data.val());
-                            });
-                            
+                    if (sessionStorage.user) {
+                        var user = JSON.parse(sessionStorage.user);
+                        if (sessionStorage.friends) {
+                            var friends = JSON.parse(sessionStorage.friends);
+                            console.log(typeof(friends));
+                            for (const [key, value] of Object.entries(friends)) {
+                                displayFriend(key, value);
+                            }
                             document.getElementById('progressbar').hidden = true;
                         } else {
-                            redirect('login.html?source=' + window.location.href);
+                            firebase.database().ref('Users/' + user.uid + '/Friends').on('child_added', function(data) {
+                                displayFriend(data.key, data.val());
+                            });
+                            firebase.database().ref('Users/' + user.uid + '/Friends').once('value', function(snapshot) {
+                                sessionStorage.setItem('friends', JSON.stringify(snapshot.val()));
+                            });
                         }
-                    });
-                }
+                    } else {
+                        firebase.auth().onAuthStateChanged(function(user) {
+                            if (user) {
+                                firebase.database().ref('Users/' + user.uid + '/Friends').on('child_added', function(data) {
+                                    displayFriend(data.key, data.val());
+                                });
 
+                                firebase.database().ref('Users/' + user.uid + '/Friends').once('value', function(snapshot) {
+                                    sessionStorage.setItem('friends', JSON.stringify(snapshot.val()));
+                                });
+                            
+                                document.getElementById('progressbar').hidden = true;
+                            } else {
+                                redirect('login.html?source=' + window.location.href);
+                            }
+                        });
+                    }
+                }
                 function addUsernameToFriends() {
                     firebase.database().ref('Users').on('child_added', function(data) {
                         firebase.database().ref('Users/' + data.key + '/Friends').on('child_added', function(friend) {
-                            firebase.database().ref('Users/' + friend + '/username').once('value', function(snapshot) {
-                                
-                            })
+                            firebase.database().ref('Users/' + friend.val() + '/username').once('value', function(username) {
+                                firebase.database().ref('Users/' + data.key + '/Friends/' + friend.key).set(username.val());
+                            });
                         });
                     });
                 }

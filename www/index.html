@@ -126,29 +126,6 @@
                 
             }
 
-              /* all options are optional, but you will want to at least add your refresh() handler */
-                var options = {
-                    paused: false,
-                    ignoreThreshold: 20,
-                    pullThreshold: 150,
-                    maxPullThreshold: 500,
-                    spinnerTimeout: 10000,
-                    scrollingDom: $('body'),
-                    allowPtrWhenStartedWhileScrolled: false,
-                    refresh: function(ptrLightInstance) {
-                        console.log('Updating...');
-                        
-                        displayPosts();
-
-                        setTimeout(function(){
-                            console.log('Updated!');
-                            ptrLightInstance.done();
-                        }, 1000);
-                    }
-                }
-
-  $('#collection').ptrLight(options);
-
             function load() {
                 displayPosts();
                 document.getElementById('progressbar').hidden = true;
@@ -173,7 +150,7 @@
                 });
 
                 firebase.database().ref('Users/' + uid + '/Friends').on('child_added', function(data) {
-                    firebase.database().ref('Users/' + data.val() + '/Posts').on('child_added', function(val) {
+                    firebase.database().ref('Users/' + data.key + '/Posts').on('child_added', function(val) {
                         var postKey = val.val();
                         firebase.database().ref('Posts/' + postKey).once('value', function(snapshot) {
                             if (search(postKey, posts)) {

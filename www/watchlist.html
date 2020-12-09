@@ -9,12 +9,14 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
     </head>
     <body onload="onLoad()">
-        <nav class="deep-orange" id="nav">
-            <div class="nav-wrapper">
-              <a href="#" data-target="slide-out" class="sidenav-trigger show-on-large"><i class="material-icons">menu</i></a>
-              <a href="#" class="brand-logo">Watchlist</a>
-            </div>
-        </nav>
+        <div class="navbar-fixed">
+            <nav class="deep-orange" id="nav">
+                <div class="nav-wrapper">
+                    <a href="#" data-target="slide-out" class="sidenav-trigger show-on-large"><i class="material-icons">menu</i></a>
+                    <a href="#" class="brand-logo">Home</a>
+                </div>
+            </nav>
+        </div>
         <ul id="slide-out" class="sidenav" id="sidenav">
             <li><div class="user-view">
                 <div class="background">
@@ -94,13 +96,11 @@
                     document.getElementById('nothing').hidden = true;
                     console.log(postID);
                     firebase.database().ref('Posts/' + postID).once('value', function(snapshot) {
-                        var item = document.createElement('a');
-                        item.onclick = function() {
-                            openPost(postID);
-                        };
+                        var item = document.createElement('div');
                         item.style = 'color: black;';
-                         item.innerHTML = '<div class="card"><div class="card-content"><span class="card-title">' + snapshot.val().title + '<span></div><div class="card-action"><a href="#" onclick=\'recommendItem("' + postID + '")\'>Recommend</a></div></div>';                       
+                        item.innerHTML = '<div class="card"><div class="card-content" onclick=\'openPost("' + postID + '")\'><span class="card-title">' + snapshot.val().title + '<span></div><div class="card-action"><a href="#" onclick=\'recommendItem("' + postID + '")\'>Recommend</a><a href="#" onclick=\'removeFromWatchlist("' + postID + '", this)\'>Remove</a></div></div>';                       
                         document.getElementById('watchlist').appendChild(item);
+                        
                     });
                 }              
             }
@@ -139,6 +139,13 @@
                     sessionStorage.setItem('activepost', JSON.stringify(snapshot.val()));
                     redirect('post.html?id=' + key);
                 });
+            }
+
+            function removeFromWatchlist(id, item) {
+                firebase.database().ref('Users/' + uid + '/Watchlist/' + id).set(null);
+                M.toast({html: 'Removed from watchlist'});
+
+                item.parentElement.parentElement.parentElement.hidden = true;
             }
         </script>
     </body>

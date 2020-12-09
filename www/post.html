@@ -101,6 +101,7 @@
                 var uid;
                 var watchlistBtn = document.getElementById('watchlistbtn');
                 var watchlistRow = document.getElementById('watchlist');
+                var postID = window.location.search.split('?id=')[1];
                 
                 function onLoad() {
                     if (sessionStorage.getItem('user')) {

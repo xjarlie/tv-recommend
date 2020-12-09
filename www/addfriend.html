@@ -141,7 +141,11 @@
 
                                       sessionStorage.removeItem('friends');
 
-                                      redirect('friends.html');
+                                      if (confirm('Friend added! Proceed to friend list?')) {
+                                        redirect('friends.html');
+                                      } else {
+                                        M.toast({html: 'Friend added'});
+                                      }
                                     })
                                     
                                   });

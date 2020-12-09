@@ -94,7 +94,9 @@
                 if (postID != 'item') {
                     firebase.database().ref('Posts/' + postID).once('value', function(snapshot) {
                         var item = document.createElement('a');
-                        item.href = 'post.html?id=' + postID;
+                        item.onclick = function() {
+                            openPost(postID);
+                        };
                         item.style = 'color: black;';
                          item.innerHTML = '<div class="card"><div class="card-content"><span class="card-title">' + snapshot.val().title + '<span></div><div class="card-action"><a href="#" onclick=\'recommendItem("' + postID + '")\'>Recommend</a></div></div>';                       
                         document.getElementById('watchlist').appendChild(item);
@@ -114,6 +116,14 @@
 
             function redirect(location) {
                 window.location.href = location;
+            }
+
+            function openPost(key) {
+                document.getElementById('progressbar').hidden = false;
+                firebase.database().ref('Posts/' + key).once('value', function(snapshot) {
+                    sessionStorage.setItem('activepost', JSON.stringify(snapshot.val()));
+                    redirect('post.html?id=' + key);
+                });
             }
         </script>
     </body>

@@ -116,6 +116,8 @@
                                     displayFriend(data.key, data.val());
                                 });
 
+                                document.getElementById('progressbar').hidden = true;
+
                                 firebase.database().ref('Users/' + user.uid + '/Friends').once('value', function(snapshot) {
                                     sessionStorage.setItem('friends', JSON.stringify(snapshot.val()));
                                 });

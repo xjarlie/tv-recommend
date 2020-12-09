@@ -9,27 +9,29 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
     </head>
     <body onload="onLoad()">
-        <nav class="deep-orange">
+        <nav class="deep-orange" id="nav">
             <div class="nav-wrapper">
+              <a href="#" data-target="slide-out" class="sidenav-trigger show-on-large"><i class="material-icons">menu</i></a>
               <a href="#" class="brand-logo">Friends</a>
-              <a href="#" data-target="slide-out" class="sidenav-trigger"><i class="material-icons">menu</i></a>
-              <ul id="nav-mobile" class="right hide-on-med-and-down">
-                <li><a href="index.html" class="waves-effect"><i class="material-icons">home</i>Home</a></li>
-                <li><a href="friends.html" class="waves-effect"><i class="material-icons">groups</i>Friends</a></li>
-                <li><a href="watchlist.html" class="waves-effect"><i class="material-icons darkmode-text">list</i>Watchlist</a></li>
-                <li><a href="account.html" class="waves-effect"><i class="material-icons">account_circle</i>Account</a></li>
-                <li><a href="https://gitreports.com/issue/Xjarlie/tv-recommend" class="waves-effect" style="font-weight: bold;"><i class="material-icons">warning</i>Feedback</a></li>
-                
-              </ul>
             </div>
         </nav>
-          <ul id="slide-out" class="sidenav">
-            <li><a href="index.html" class="waves-effect"><i class="material-icons">home</i>Home</a></li>
-                <li class="active"><a href="friends.html" class="waves-effect"><i class="material-icons">groups</i>Friends</a></li>
-                <li><a href="watchlist.html" class="waves-effect"><i class="material-icons darkmode-text">list</i>Watchlist</a></li>
-                <li><a href="account.html" class="waves-effect"><i class="material-icons">account_circle</i>Account</a></li>
-                <li><a href="https://gitreports.com/issue/Xjarlie/tv-recommend" class="waves-effect" style="font-weight: bold;"><i class="material-icons">warning</i>Feedback</a></li>
-          </ul>
+        <ul id="slide-out" class="sidenav" id="sidenav">
+            <li><div class="user-view">
+                <div class="background">
+                    <img src="img/orange.png">
+                </div>
+                
+                <a href="account.html"><span class="white-text name" id="username-nav">Username loading...</span></a>
+                <a href="account.html"><span class="white-text email" id="email-nav">Email loading...</span></a>
+            </div></li>
+            <li><a href="index.html" class="waves-effect darkmode-text" ><i class="material-icons darkmode-text">home</i>Home</a></li>
+            <li><a href="friends.html" class="waves-effect darkmode-text" ><i class="material-icons darkmode-text" >groups</i>Friends</a></li>
+            <li><a href="watchlist.html" class="waves-effect"><i class="material-icons darkmode-text">list</i>Watchlist</a></li>
+            <li><a href="account.html" class="waves-effect darkmode-text" ><i class="material-icons darkmode-text" >account_circle</i>Account</a></li>
+            <li><div class="divider"></div></li>
+            <li><a href="https://gitreports.com/issue/Xjarlie/tv-recommend" class="waves-effect" style="font-weight: bold;"><i class="material-icons">warning</i>Feedback</a></li>
+        </ul>
+          
 
         </br>
 
@@ -86,6 +88,21 @@
                     window.location.href = location;
                 }
 
+                function showInfo(user) {
+                if (sessionStorage.getItem('email') && sessionStorage.getItem('username')) {
+                    document.getElementById('username-nav').innerHTML = sessionStorage.getItem('username');
+                    document.getElementById('email-nav').innerHTML = sessionStorage.getItem('email');
+                } else {
+                    firebase.database().ref('Users/' + user.uid + '/username').once('value', function(snapshot) {
+                        document.getElementById('username-nav').innerHTML = snapshot.val();
+                        document.getElementById('email-nav').innerHTML = user.email;
+
+                        sessionStorage.setItem('username', snapshot.val());
+                        sessionStorage.setItem('email', user.email);
+                    });
+                }
+            }
+
                 function displayFriend(uid, name) {
                     document.getElementById('friendlist').innerHTML += '<a href="user.html?id=' + uid + '"><li class="collection-item">' + name + '</li></a>';
                     document.getElementById('nothing').hidden = true;
@@ -94,6 +111,7 @@
                 function onLoad() {
                     if (sessionStorage.user) {
                         var user = JSON.parse(sessionStorage.user);
+                        showInfo(user);
                         if (sessionStorage.friends) {
                             var friends = JSON.parse(sessionStorage.friends);
                             console.log(typeof(friends));
@@ -114,6 +132,8 @@
                     } else {
                         firebase.auth().onAuthStateChanged(function(user) {
                             if (user) {
+                                showInfo(user);
+
                                 firebase.database().ref('Users/' + user.uid + '/Friends').on('child_added', function(data) {
                                     displayFriend(data.key, data.val());
                                 });

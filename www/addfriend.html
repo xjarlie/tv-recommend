@@ -134,9 +134,18 @@
                                 if (snapshot.val()) {
                                   redirect('friends.html');
                                 } else {
-                                  firebase.database().ref('Users/' + uid + '/Friends/' + friendID).set(friendID);
-                                  firebase.database().ref('Users/' + friendID + '/Friends/' + uid).set(uid);
-                                  redirect('friends.html');
+                                  firebase.database().ref('Users/' + friendID + '/username').once('value', function(snapshot) {
+                                    firebase.database().ref('Users/' + uid + '/Friends/' + friendID).set(snapshot.val());
+                                    firebase.database().ref('Users/' + uid + '/username').once('value', function(snapshot2) {
+                                      firebase.database().ref('Users/' + friendID + '/Friends/' + uid).set(snapshot2.val());
+
+                                      sessionStorage.removeItem('friends');
+
+                                      redirect('friends.html');
+                                    })
+                                    
+                                  });
+
                                 }
                             });
                         

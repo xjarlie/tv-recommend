@@ -124,9 +124,9 @@
                         } else {
                             firebase.database().ref('Users/' + user.uid + '/Friends').on('child_added', function(data) {
                                 displayFriend(data.key, data.val());
-                            }).then(function() {
                                 document.getElementById('progressbar').hidden = true;
                             });
+                                
                             firebase.database().ref('Users/' + user.uid + '/Friends').once('value', function(snapshot) {
                                 sessionStorage.setItem('friends', JSON.stringify(snapshot.val()));
                             });

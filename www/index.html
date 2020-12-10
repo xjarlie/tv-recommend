@@ -124,16 +124,19 @@
                 });
                 }
                 
-                firebase.database().ref('Users/' + uid + '/Friends').once('value', function(snapshot) {
-                    sessionStorage.setItem('friends', JSON.stringify(snapshot.val()));
-                });
-
                 
+
             }
+
+            
 
             function load() {
                 displayPosts();
+                firebase.database().ref('Users/' + uid + '/Friends').once('value', function(snapshot) {
+                sessionStorage.setItem('friends', JSON.stringify(snapshot.val()));
+                console.log(sessionStorage.friends);
                 document.getElementById('progressbar').hidden = true;
+            });
             }
 
             function showInfo(user) {

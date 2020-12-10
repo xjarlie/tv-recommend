@@ -1,0 +1,28 @@
+{
+  "name": "ptrLight",
+  "main": "ptrLight.min.js",
+  "homepage": "https://github.com/aurasalexander/ptrLight",
+  "authors": [
+    "Alexander Auras <auras.alexander@gmail.com>"
+  ],
+  "description": "A lightweight pull to refresh indicator for mobile use.",
+  "keywords": [
+    "ptr",
+    "pull",
+    "to",
+    "refresh",
+    "mobile",
+    "javascript",
+    "jquery",
+    "angular"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests",
+	"demo.*"
+  ]
+}

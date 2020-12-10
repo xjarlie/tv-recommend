@@ -7,34 +7,38 @@
         <link type="text/css" rel="stylesheet" href="css/materialize.min.css"  media="screen,projection"/>
         <link rel="manifest" href="manifest.json">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="../node_modules/mobile-pull-to-refresh/dist/styles/material/style.css">
+        <script src="../node_modules/mobile-pull-to-refresh/dist/pullToRefresh.js"></script>
 
         <style>
             
         </style>
     </head>
     <body onload="onLoad()" id="body">
-        <nav class="deep-orange" id="nav">
-            <div class="nav-wrapper">
-              <a href="#" class="brand-logo">Home</a>
-              <a href="#" data-target="slide-out" class="sidenav-trigger"><i class="material-icons">menu</i></a>
-              
-              <ul id="nav-mobile" class="right hide-on-med-and-down">
-                <li><a href="index.html" class="waves-effect"><i class="material-icons">home</i>Home</a></li>
-                <li><a href="friends.html" class="waves-effect"><i class="material-icons">groups</i>Friends</a></li>
-                <li><a href="watchlist.html" class="waves-effect"><i class="material-icons darkmode-text">list</i>Watchlist</a></li>
-                <li><a href="account.html" class="waves-effect"><i class="material-icons">account_circle</i>Account</a></li>
-                <li><a href="https://gitreports.com/issue/Xjarlie/tv-recommend" class="waves-effect" style="font-weight: bold;"><i class="material-icons">warning</i>Feedback</a></li>
+        <div class="navbar-fixed">
+            <nav class="deep-orange" id="nav">
+                <div class="nav-wrapper">
+                    <a href="#" data-target="slide-out" class="sidenav-trigger show-on-large"><i class="material-icons">menu</i></a>
+                    <a href="#" class="brand-logo">Home</a>
+                </div>
+            </nav>
+        </div>
+        <ul id="slide-out" class="sidenav" id="sidenav">
+            <li><div class="user-view">
+                <div class="background">
+                    <img src="img/orange.png">
+                </div>
                 
-              </ul>
-            </div>
-        </nav>
-          <ul id="slide-out" class="sidenav" id="sidenav" >
+                <a href="account.html"><span class="white-text name" id="username-nav">Username loading...</span></a>
+                <a href="account.html"><span class="white-text email" id="email-nav">Email loading...</span></a>
+            </div></li>
             <li><a href="index.html" class="waves-effect darkmode-text" ><i class="material-icons darkmode-text">home</i>Home</a></li>
-                <li><a href="friends.html" class="waves-effect darkmode-text" ><i class="material-icons darkmode-text" >groups</i>Friends</a></li>
-                <li><a href="watchlist.html" class="waves-effect"><i class="material-icons darkmode-text">list</i>Watchlist</a></li>
-                <li><a href="account.html" class="waves-effect darkmode-text" ><i class="material-icons darkmode-text" >account_circle</i>Account</a></li>
-                <li><a href="https://gitreports.com/issue/Xjarlie/tv-recommend" class="waves-effect" style="font-weight: bold;"><i class="material-icons">warning</i>Feedback</a></li>
-          </ul>
+            <li><a href="friends.html" class="waves-effect darkmode-text" ><i class="material-icons darkmode-text" >groups</i>Friends</a></li>
+            <li><a href="watchlist.html" class="waves-effect"><i class="material-icons darkmode-text">list</i>Watchlist</a></li>
+            <li><a href="account.html" class="waves-effect darkmode-text" ><i class="material-icons darkmode-text" >account_circle</i>Account</a></li>
+            <li><div class="divider"></div></li>
+            <li><a href="https://gitreports.com/issue/Xjarlie/tv-recommend" class="waves-effect" style="font-weight: bold;"><i class="material-icons">warning</i>Feedback</a></li>
+        </ul>
           
 
         </br>
@@ -44,6 +48,10 @@
                 <div class="progress">
                     <div class="indeterminate"></div>
                 </div>
+            </div>
+            <div class="row center-align" id="nothing">
+                <h5>Nothing here</h5>
+                <h6>Start by creating a post using the pencil button</h6>
             </div>
             
         </div>
@@ -69,6 +77,10 @@
             <script src="serviceWorker1/pwabuilder-sw-register.js" type="module"></script>
             <script src="serviceWorker1/pwabuilder-sw.js"></script>
 
+            <link rel="stylesheet" href="lib/ptrLight.css">
+            <script src="https://code.jquery.com/jquery-2.2.3.min.js" type="text/javascript"></script>
+            <script src="lib/ptrLight.js"></script>
+
         <script>
             // Your web app's Firebase configuration
             var firebaseConfig = {
@@ -84,25 +96,62 @@
             firebase.initializeApp(firebaseConfig);
             var uid;
             function onLoad() {
-                firebase.auth().onAuthStateChanged(function(user) {
-                    if (user) {
-                        // User is signed in.
-                        var displayName = user.displayName;
-                        var email = user.email;
-                        var emailVerified = user.emailVerified;
-                        var photoURL = user.photoURL;
-                        var isAnonymous = user.isAnonymous;
-                        uid = user.uid;
-                        var providerData = user.providerData;
-                        // ...
+                if (sessionStorage.user) {
+                    uid = JSON.parse(sessionStorage.getItem('user')).uid;
+                    showInfo(JSON.parse(sessionStorage.getItem('user')));
+                    load();
+                } else {
+                    firebase.auth().onAuthStateChanged(function(user) {
+                        if (user) {
+                            console.log('authuser');
+                            // User is signed in.
+                            var displayName = user.displayName;
+                            var email = user.email;
+                            var emailVerified = user.emailVerified;
+                            var photoURL = user.photoURL;
+                            var isAnonymous = user.isAnonymous;
+                            uid = user.uid;
+                            var providerData = user.providerData;
+                            // ...
+                            sessionStorage.setItem('user', JSON.stringify(user));
+
+                            showInfo(user);
                         
-                        displayPosts();
-                        document.getElementById('progressbar').hidden = true;
+                            load();
                     } else {
                         redirect('login.html?source=' + window.location.href);
                     }
                 });
+                }
                 
+                
+
+            }
+
+            
+
+            function load() {
+                displayPosts();
+                firebase.database().ref('Users/' + uid + '/Friends').once('value', function(snapshot) {
+                    sessionStorage.setItem('friends', JSON.stringify(snapshot.val()));
+                    console.log(sessionStorage.friends);
+                    document.getElementById('progressbar').hidden = true;
+                });
+            }
+
+            function showInfo(user) {
+                if (sessionStorage.getItem('email') && sessionStorage.getItem('username')) {
+                    document.getElementById('username-nav').innerHTML = sessionStorage.getItem('username');
+                    document.getElementById('email-nav').innerHTML = sessionStorage.getItem('email');
+                } else {
+                    firebase.database().ref('Users/' + user.uid + '/username').once('value', function(snapshot) {
+                        document.getElementById('username-nav').innerHTML = snapshot.val();
+                        document.getElementById('email-nav').innerHTML = user.email;
+
+                        sessionStorage.setItem('username', snapshot.val());
+                        sessionStorage.setItem('email', user.email);
+                    });
+                }
             }
 
             function redirect(location) {
@@ -115,38 +164,91 @@
             });
 
             function displayPosts() {
+                var posts = JSON.parse(sessionStorage.getItem('posts') || '[]');
+
+
+                posts.forEach(element => {
+                    console.log('posts.foreach');
+                    postToCard(element.post, element.key);
+                });
+
                 firebase.database().ref('Users/' + uid + '/Friends').on('child_added', function(data) {
-                    firebase.database().ref('Users/' + data.val() + '/Posts').on('child_added', function(val) {
+                    firebase.database().ref('Users/' + data.key + '/Posts').on('child_added', function(val) {
                         var postKey = val.val();
-                        firebase.database().ref('Posts/' + val.val()).once('value', function(snapshot) {
-                            postToCard(snapshot.val(), postKey);
+                        firebase.database().ref('Posts/' + postKey).once('value', function(snapshot) {
+                            if (search(postKey, posts)) {
+                            } else {
+                                var parsed = JSON.parse(sessionStorage.getItem('posts') || '[]');
+                                parsed.push({key: postKey, post: snapshot.val()});
+                                sessionStorage.setItem('posts', JSON.stringify(parsed));
+
+                                postToCard(snapshot.val(), postKey);
+                            }
                         })
                     });
                 });
                 firebase.database().ref('Users/' + uid + '/Posts').on('child_added', function(data) {
                     var postKey = data.val();
                     firebase.database().ref('Posts/' + postKey).once('value', function(snapshot) {
-                        postToCard(snapshot.val(), postKey);
+                        if (search(postKey, posts)) {
+                            } else {
+                                var parsed = JSON.parse(sessionStorage.getItem('posts') || '[]');
+                                parsed.push({key: postKey, post: snapshot.val()});
+                                sessionStorage.setItem('posts', JSON.stringify(parsed));
+
+                                postToCard(snapshot.val(), postKey);
+                            }
                     });
                 });
             }
 
             function postToCard(post, postKey) {
-                firebase.database().ref('Users/' + post.author + '/username').once('value', function(snapshot) {
-                    
-                    username = snapshot.val();
-                    console.log(username);
-                    console.log(post);
-                    var card = document.createElement('div');
-                    card.classList.add('row');
-                    card.innerHTML = '<a href=post.html?id=' + postKey + ' style="color: black; font-weight: bold;"><div class="card"><div class="card-content"><span class="card-title" style="font-weight: bold;">' + post.title + '</span><p class="deep-orange-text">' + username + '</p></div></div></a>';
-                    document.getElementById('collection').appendChild(card);
+                var username = post.authorname;
+                console.log('username got');
+                var card = document.createElement('div');
+                card.classList.add('row');
+                var category;
+                if (post.category == 1) {
+                    category = 'TV Show';
+                } else if (post.category == 2) {
+                    category = 'Movie';
+                } else {
+                    category = 'TV/Movie';
+                }
+                card.innerHTML = '<a href=# style="color: black; font-weight: bold;" onclick="openPost(\'' + postKey + '\')"><div class="card"><div class="card-content"><span class="card-title" style="font-weight: bold;">' + post.title + '</span><div class="chip">' + category + '</div><p class="deep-orange-text">' + username + '</p></div></div></a>';
+                document.getElementById('collection').prepend(card);
+                document.getElementById('nothing').hidden = true;
+            }
+
+            function search(key, array) {
+                for (var i=0; i < array.length; i++) {
+                    if (array[i].key == key) {
+                        return array[i];
+                    }
+                }
+            }
+
+            function openPost(key) {
+                document.getElementById('progressbar').hidden = false;
+                firebase.database().ref('Posts/' + key).once('value', function(snapshot) {
+                    sessionStorage.setItem('activepost', JSON.stringify(snapshot.val()));
+                    redirect('post.html?id=' + key);
                 });
             }
 
             function darken() {
                 document.getElementById('body').style.backgroundColor = '#121212';
                 document.getElementById('nav', 'fab').classList.add('darken-3');
+            }
+
+
+            function addUsernameToPosts() {
+                firebase.database().ref('Posts').on('child_added', function(data) {
+                    var key = data.key;
+                    firebase.database().ref('Users/' + data.val().author + '/username').once('value', function(snapshot) {
+                        firebase.database().ref('Posts/' + key + '/authorname').set(snapshot.val());
+                    });
+                })
             }
         </script>
 

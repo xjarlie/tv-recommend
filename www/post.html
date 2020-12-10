@@ -13,26 +13,23 @@
   color: orange;
 }
         </style>
+
+        <script>uid = JSON.parse(sessionStorage.getItem('user')).uid || '';</script>
     </head>
     <body onload="onLoad()">
-        <nav class="deep-orange" style="top: 0;">
-            <div class="nav-wrapper">
-              <a href="#" class="brand-logo">View Post</a>
-              <a onclick="window.history.back()" class="sidenav-trigger"><i class="material-icons">arrow_back</i></a>
-              <ul id="nav-mobile" class="right hide-on-med-and-down">
-                <li><a href="index.html" class="waves-effect"><i class="material-icons">home</i>Home</a></li>
-                <li><a href="friends.html" class="waves-effect"><i class="material-icons">groups</i>Friends</a></li>
-                <li><a href="account.html" class="waves-effect"><i class="material-icons">account_circle</i>Account</a></li>
-                
-              </ul>
-            </div>
-        </nav>
+        <div class="navbar-fixed">
+            <nav class="deep-orange" id="nav">
+                <div class="nav-wrapper">
+                    <a href="index.html" class="sidenav-trigger show-on-large"><i class="material-icons">arrow_back</i></a>
+                    <a href="#" class="brand-logo">View Post</a>
+                </div>
+            </nav>
+        </div>
           <ul id="slide-out" class="sidenav">
                 <li><a href="index.html" class="waves-effect"><i class="material-icons">home</i>Home</a></li>
                 <li><a href="friends.html" class="waves-effect"><i class="material-icons">groups</i>Friends</a></li>
                 <li><a href="account.html" class="waves-effect"><i class="material-icons">account_circle</i>Account</a></li>
           </ul>
-          
 
           <div class="container">
             <div class="row" id="progressbar">
@@ -41,6 +38,9 @@
                 </div>
             </div>
               <div class="row"><h4 id="title"></h2></div>
+              <div class="row" hidden=true>
+                  <div class="chip" id="category"></div>
+              </div>
               <div class="row" hidden=true id="rating">
                 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
@@ -56,13 +56,14 @@
                   <button type="button" class="waves-effect btn deep-orange" id="watchlistbtn"></button>
               </div>
               <div class="row"><p id="source" class="flow-text" style="font-weight: bolder;"></p></div>
+              <div class="row"><p id="genre" class="flow-text" style="font-weight: bolder;"></p></div>
               <div class="row"><p id="description" class="flow-text"></p></div>
               <div class="row" id="tags"></div>
               <div class="row" id="watchrow" hidden=true>
                   <a class="waves-effect btn deep-orange" id="wheretowatch"><i class="material-icons left">open_in_new</i>Where to watch</a>
               </div>
               <div class="row" id="recommend" hidden="true">
-                <button type="button" class="waves-effect btn deep-orange" id="recommendbtn" onclick="recommend()">recommend</button>
+                <button type="button" class="waves-effect btn deep-orange" id="recommendbtn" onclick="recommend()"><i class="material-icons left">add</i>recommend</button>
               </div>
               <div class="row" hidden=true id="delete">
                   <button class="btn waves-effect red darken-4" type="button" onclick="deletePost()"><i class="material-icons left">delete</i>Delete Post</button>
@@ -95,45 +96,128 @@
                 // Initialize Firebase
                 firebase.initializeApp(firebaseConfig);
 
-                var postID = window.location.search.split('?id=')[1];
+                var postID; 
                 var uid;
                 var watchlistBtn = document.getElementById('watchlistbtn');
                 var watchlistRow = document.getElementById('watchlist');
+                var postID = window.location.search.split('?id=')[1];
                 
                 function onLoad() {
-                    firebase.auth().onAuthStateChanged(function(user) {
-                        if (user) {
-                            uid = user.uid;
+                    if (sessionStorage.getItem('user')) {
+                        uid = JSON.parse(sessionStorage.getItem('user')).uid;
+                        postID = window.location.search.split('?id=')[1]; 
 
+                        firebase.database().ref('Posts/' + postID + '/author').once('value', function(snapshot) {
+                            console.log(snapshot);
+                            if (snapshot.val() == uid) {
+                                document.getElementById('delete').hidden = false;
+                            } else {
+                                document.getElementById('recommend').hidden = false;
+                            }
+                        });
+
+                        document.getElementById('watchrow').hidden = false;
+
+                        firebase.database().ref('Users/' + uid + '/Watchlist/' + postID).once('value', function(snapshot) {
+                            document.getElementById('watchlist').hidden = false;
+                            if (snapshot.val()) {
+                                watchlistBtn.innerHTML = '<i class="material-icons left">remove_circle_outline</i>Remove from watchlist';
+                                watchlistBtn.onclick = function() {removeFromWatchlist()};
+                            } else {
+                                watchlistBtn.innerHTML = '<i class="material-icons left">playlist_add</i>Add to watchlist';
+                                watchlistBtn.onclick = function() {addToWatchlist()};
+                            }
+                            document.getElementById('progressbar').hidden = true;
+                        })
                             
-                            firebase.database().ref('Posts/' + postID + '/author').once('value', function(snapshot) {
-                                if (snapshot.val() == uid) {
-                                    document.getElementById('delete').hidden = false;
-                                } else {
-                                    document.getElementById('recommend').hidden = false;
-                                }
-                            })
 
-                            document.getElementById('watchrow').hidden = false;
+                        firebase.database().ref('Users/' + uid + '/Watchlist/item').set('item');
+                        
+                    } else {
+                        firebase.auth().onAuthStateChanged(function(user) {
+                            if (user) {
+                                uid = user.uid;
 
-                            firebase.database().ref('Users/' + uid + '/Watchlist/' + postID).once('value', function(snapshot) {
-                                document.getElementById('watchlist').hidden = false;
+                                firebase.database().ref('Posts/' + postID + '/author').once('value', function(snapshot) {
+                                    if (snapshot.val() == uid) {
+                                        document.getElementById('delete').hidden = false;
+                                    } else {
+                                        document.getElementById('recommend').hidden = false;
+                                    }
+                                })
+
+                                document.getElementById('watchrow').hidden = false;
+
+                                firebase.database().ref('Users/' + uid + '/Watchlist/' + postID).once('value', function(snapshot) {
+                                    document.getElementById('watchlist').hidden = false;
                                 
-                                if (snapshot.val()) {
-                                    watchlistBtn.innerHTML = '<i class="material-icons left">remove_circle_outline</i>Remove from watchlist';
-                                    watchlistBtn.onclick = function() {removeFromWatchlist()};
-                                } else {
-                                    watchlistBtn.innerHTML = '<i class="material-icons left">playlist_add</i>Add to watchlist';
-                                    watchlistBtn.onclick = function() {addToWatchlist()};
-                                }
-                            })
+                                    if (snapshot.val()) {
+                                        watchlistBtn.innerHTML = '<i class="material-icons left">remove_circle_outline</i>Remove from watchlist';
+                                        watchlistBtn.onclick = function() {removeFromWatchlist()};
+                                    } else {
+                                        watchlistBtn.innerHTML = '<i class="material-icons left">playlist_add</i>Add to watchlist';
+                                        watchlistBtn.onclick = function() {addToWatchlist()};
+                                    }
+                                })
                             
 
-                            firebase.database().ref('Users/' + uid + '/Watchlist/item').set('item');
-                        } else {    
-                            redirect('login.html?source=' + window.location.href);
+                                firebase.database().ref('Users/' + uid + '/Watchlist/item').set('item');
+                                document.getElementById('progressbar').hidden = true;
+                            } else {    
+                                redirect('login.html?source=' + window.location.href);
+                            }
+                        });
+                    }
+
+                    if (sessionStorage.getItem('activepost')) {
+                        var post = JSON.parse(sessionStorage.getItem('activepost'));
+                        
+                        document.getElementById('title').innerHTML = post.title;
+                        document.getElementById('author').innerHTML = post.authorname;
+                        document.getElementById('author-link').href = 'user.html?id=' + post.author;
+                        document.getElementById('wheretowatch').href = 'https://justwatch.com/uk/search?q=' + post.title;
+                        document.getElementById('source').innerHTML = 'Watched On: ' + post.source || '';
+                        document.getElementById('description').innerHTML = post.description || '';
+                        document.getElementById('genre').innerHTML = 'Genre: ' + post.genre || '';
+
+                        var category = post.category;
+                        if (category) {
+                            if (category == 1) {
+                                document.getElementById('category').innerHTML = 'TV Show';
+                                document.getElementById('category').parentElement.hidden = false;
+                            } else if (category == 2) {
+                                document.getElementById('category').innerHTML = 'Movie';
+                                document.getElementById('category').parentElement.hidden = false;
+                            }
+                            
                         }
-                    });
+
+                        if (post.tags) {
+                            post.tags.forEach(function(tag) {
+                            var chip = document.createElement('div');
+                            chip.classList = 'chip';
+                            chip.innerHTML = tag;
+                            document.getElementById('tags').appendChild(chip);
+                        });
+                        var chipArray = Array.from(document.getElementsByClassName('chip'))
+                        chipArray.forEach(function(chip) {
+                            console.log(chip);
+                            chip.onclick = function() {
+                                redirect('tag.html?tag=' + chip.innerHTML.split('<i')[0].toLowerCase());
+                            };
+                        });
+                        document.getElementById('rating').hidden = false;
+                        var rating = post.rating;
+                        var i = 1;
+                        while (i <= rating) {
+                            document.getElementById('star-' + i).classList += ' checked';
+                            i++;
+                        }
+                        }
+                        
+                    } else {
+
+                    
 
                     var postID = window.location.search.split('?id=')[1];
                     firebase.database().ref('Posts/' + postID).once('value', function(snapshot) {
@@ -146,6 +230,19 @@
 
                         document.getElementById('title').innerHTML = snapshot.val().title;
                         document.getElementById('description').innerHTML = snapshot.val().description || '';
+                        document.getElementById('genre').innerHTML = 'Genre: ' + snapshot.val().genre || '';
+                        var category = snapshot.val().category;
+                        if (category) {
+                            if (category == 1) {
+                                document.getElementById('category').innerHTML = 'TV Show';
+                                document.getElementById('category').parentElement.hidden = false;
+                            } else if (category == 2) {
+                                document.getElementById('category').innerHTML = 'Movie';
+                                document.getElementById('category').parentElement.hidden = false;
+                            }
+                            
+                        }
+
                         if (snapshot.val().source) {
                             document.getElementById('source').innerHTML = 'Watched on: ' + snapshot.val().source;
                         }
@@ -177,7 +274,7 @@
                         document.getElementById('progressbar').hidden = true;
                         
                     });
-
+                    }
                 }
 
                 function redirect(location) {
@@ -210,6 +307,7 @@
                             firebase.database().ref('Users/' + uid + '/Posts').on('child_added', function(data) {
                                 if (data.val() == postID) {
                                     firebase.database().ref('Users/' + uid + '/Posts/' + data.key).set(null);
+                                    sessionStorage.setItem('posts', '');
                                     redirect('index.html');
                                 }
                             });

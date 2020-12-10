@@ -38,6 +38,9 @@
                 </div>
             </div>
               <div class="row"><h4 id="title"></h2></div>
+              <div class="row" hidden=true>
+                  <div class="chip" id="category"></div>
+              </div>
               <div class="row" hidden=true id="rating">
                 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
@@ -53,6 +56,7 @@
                   <button type="button" class="waves-effect btn deep-orange" id="watchlistbtn"></button>
               </div>
               <div class="row"><p id="source" class="flow-text" style="font-weight: bolder;"></p></div>
+              <div class="row"><p id="genre" class="flow-text" style="font-weight: bolder;"></p></div>
               <div class="row"><p id="description" class="flow-text"></p></div>
               <div class="row" id="tags"></div>
               <div class="row" id="watchrow" hidden=true>
@@ -174,6 +178,19 @@
                         document.getElementById('wheretowatch').href = 'https://justwatch.com/uk/search?q=' + post.title;
                         document.getElementById('source').innerHTML = 'Watched On: ' + post.source || '';
                         document.getElementById('description').innerHTML = post.description || '';
+                        document.getElementById('genre').innerHTML = 'Genre: ' + post.genre || '';
+
+                        var category = post.category;
+                        if (category) {
+                            if (category == 1) {
+                                document.getElementById('category').innerHTML = 'TV Show';
+                                document.getElementById('category').parentElement.hidden = false;
+                            } else if (category == 2) {
+                                document.getElementById('category').innerHTML = 'Movie';
+                                document.getElementById('category').parentElement.hidden = false;
+                            }
+                            
+                        }
 
                         if (post.tags) {
                             post.tags.forEach(function(tag) {
@@ -213,6 +230,19 @@
 
                         document.getElementById('title').innerHTML = snapshot.val().title;
                         document.getElementById('description').innerHTML = snapshot.val().description || '';
+                        document.getElementById('genre').innerHTML = 'Genre: ' + snapshot.val().genre || '';
+                        var category = snapshot.val().category;
+                        if (category) {
+                            if (category == 1) {
+                                document.getElementById('category').innerHTML = 'TV Show';
+                                document.getElementById('category').parentElement.hidden = false;
+                            } else if (category == 2) {
+                                document.getElementById('category').innerHTML = 'Movie';
+                                document.getElementById('category').parentElement.hidden = false;
+                            }
+                            
+                        }
+
                         if (snapshot.val().source) {
                             document.getElementById('source').innerHTML = 'Watched on: ' + snapshot.val().source;
                         }

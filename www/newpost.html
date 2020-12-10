@@ -93,7 +93,20 @@
                     </div>
                 </br>
             </br>
-        </br>
+        
+                    
+                    <div class="row">
+                        <div class="input-field">
+                            <input id="genre" type="text">
+                            <label for="genre">Genre (Optional)</label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="input-field">
+                            <input id="source" type="text">
+                            <label for="source">Where did you watch it? (Netflix, Amazon, etc)</label>
+                        </div>
+                    </div>
                     <div class="row">
                         <div class="input-field">
                             <textarea id="description" class="materialize-textarea"></textarea>
@@ -102,8 +115,12 @@
                     </div>
                     <div class="row">
                         <div class="input-field">
-                            <input id="source" type="text">
-                            <label for="source">Where did you watch it? (Netflix, Amazon, etc)</label>
+                            <select id="category">
+                                <option value="" disabled selected>TV or Movie</option>
+                                <option value="1" class="waves-effect">TV Show</option>
+                                <option value="2" class="waves-effect">Movie</option>
+                            </select>
+                            <label>Type of recommendation</label>
                         </div>
                     </div>
                     <div class="row">
@@ -209,6 +226,11 @@
                     var instances = M.Chips.init(elems);
                 });
 
+                document.addEventListener('DOMContentLoaded', function() {
+                    var elems = document.querySelectorAll('select');
+                    var instances = M.FormSelect.init(elems);
+                });
+
                 function post() {
                     document.getElementById('recommendBtn').classList.add('disabled');
 
@@ -216,6 +238,9 @@
                     var description = document.getElementById('description').value || '';
                     var tagsNodeList = document.getElementById('descriptors').childNodes || [];
                     var source = document.getElementById('source').value || '';
+                    var genre = document.getElementById('genre').value || '';
+                    console.log(genre);
+                    var category = document.getElementById('category').value || '';
                     var tags = [];
                     tagsNodeList.forEach(function(item, index) {
                         var inner = item.textContent.toLowerCase();
@@ -241,7 +266,9 @@
                             author: userID,
                             source: source,
                             rating: rating,
-                            authorname: username
+                            authorname: username,
+                            genre: genre,
+                            category: category
                         }).then(function() {
                             firebase.database().ref('Users/' + userID + '/Posts').push(ref.key).then(function() {
                                 if (fromID) {

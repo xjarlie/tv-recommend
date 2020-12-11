@@ -112,9 +112,9 @@
                     <div class="row">
                         <div class="input-field">
                             <select id="category">
-                                <option value="0" disabled selected>TV or Movie</option>
-                                <option value="1" class="waves-effect">TV Show</option>
-                                <option value="2" class="waves-effect">Movie</option>
+                                <option value="0" disabled selected id="no-option">TV or Movie</option>
+                                <option value="1" class="waves-effect" id="tv-option">TV Show</option>
+                                <option value="2" class="waves-effect" id="movie-option">Movie</option>
                             </select>
                             <label>Type of recommendation</label>
                         </div>
@@ -168,6 +168,15 @@
 
                                 document.getElementById('title').value = post.title;
                                 document.getElementById('category').value = post.category;
+
+                                if (post.category == 1) {
+                                    document.getElementById('no-option').removeAttribute('selected');
+                                    document.getElementById('tv-option').selected = true;
+                                } else if (post.category == 2) {
+                                    document.getElementById('no-option').removeAttribute('selected');
+                                    document.getElementById('movie-option').selected = true;
+                                }
+
                                 document.getElementById('genre').value = post.genre || '';
                                 document.getElementById('source').value = post.source || '';
                                 document.getElementById('description').value = post.description || '';

@@ -65,6 +65,9 @@
               <div class="row" id="recommend" hidden="true">
                 <button type="button" class="waves-effect btn deep-orange" id="recommendbtn" onclick="recommend()"><i class="material-icons left">add</i>recommend</button>
               </div>
+              <div class="row" id="edit" hidden=true>
+                  <button type="button" class="waves-effect btn deep-orange" id="editBtn" onclick="edit()"><i class="material-icons left">edit</i>Edit Post</button>
+              </div>
               <div class="row" hidden=true id="delete">
                   <button class="btn waves-effect red darken-4" type="button" onclick="deletePost()"><i class="material-icons left">delete</i>Delete Post</button>
               </div>
@@ -111,6 +114,7 @@
                             console.log(snapshot);
                             if (snapshot.val() == uid) {
                                 document.getElementById('delete').hidden = false;
+                                document.getElementById('edit').hidden = false;
                             } else {
                                 document.getElementById('recommend').hidden = false;
                             }
@@ -333,6 +337,22 @@
 
                 function recommend() {
                     redirect('newpost.html?from=' + postID);
+                }
+
+                function edit() {
+                    var postID = window.location.search.split('?id=')[1];
+
+                    //Check that the user is the post author
+                    var userIsAuthor = false;
+                    firebase.database().ref('Posts/' + postID + '/author').once('value', function(snapshot) {
+                        if (snapshot.val() == uid) {
+                            userIsAuthor = true;
+                        }
+                    }).then(function() {
+                        if (userIsAuthor) {
+                            redirect('edit.html?id=' + postID);
+                        }
+                    });
                 }
             </script>
     </body>

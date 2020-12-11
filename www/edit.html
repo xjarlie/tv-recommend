@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>New Post - WhatsOn</title>
+        <title>Edit Post - WhatsOn</title>
         <link rel="stylesheet" href="css/style.css">
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
         <link type="text/css" rel="stylesheet" href="css/materialize.min.css"  media="screen,projection"/>
@@ -53,7 +53,7 @@
         </div>
 
           <ul id="slide-out" class="sidenav">
-            <li><a href="index.html" class="waves-effect"><i class="material-icons">home</i>Home</a></li>
+                <li><a href="index.html" class="waves-effect"><i class="material-icons">home</i>Home</a></li>
                 <li><a href="friends.html" class="waves-effect"><i class="material-icons">groups</i>Friends</a></li>
                 <li><a href="account.html" class="waves-effect"><i class="material-icons">account_circle</i>Account</a></li>
           </ul>
@@ -80,19 +80,16 @@
                     <div class="row">
                         <h6>Rating:</h6>
                     </div>
-                    <div class="row" style="float: left;">
-                        
-                        <div class="rating">
-                            <span><input type="radio" name="rating" id="str5" value="5"><label for="str5"></label></span>
-                            <span><input type="radio" name="rating" id="str4" value="4"><label for="str4"></label></span>
-                            <span><input type="radio" name="rating" id="str3" value="3"><label for="str3"></label></span>
-                            <span><input type="radio" name="rating" id="str2" value="2"><label for="str2"></label></span>
-                            <span><input type="radio" name="rating" id="str1" value="1"><label for="str1"></label></span>
-                        </div>
-                    </div>
-                </br>
-            </br>
+                    <div class="row" id="rating">
+                        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
         
+                        <span class="fa fa-star" id="star-1"></span>
+                        <span class="fa fa-star" id="star-2"></span>
+                        <span class="fa fa-star" id="star-3"></span>
+                        <span class="fa fa-star" id="star-4"></span>
+                        <span class="fa fa-star" id="star-5"></span>
+                      </div>
+                    </br>
                     
                     <div class="row">
                         <div class="input-field">
@@ -115,7 +112,7 @@
                     <div class="row">
                         <div class="input-field">
                             <select id="category">
-                                <option value="" disabled selected>TV or Movie</option>
+                                <option value="0" disabled selected>TV or Movie</option>
                                 <option value="1" class="waves-effect">TV Show</option>
                                 <option value="2" class="waves-effect">Movie</option>
                             </select>
@@ -123,14 +120,7 @@
                         </div>
                     </div>
                     <div class="row">
-                        <label>Descriptor tags (Optional)</label>
-                        <div class="chips chips-initial input-field" id="descriptors">
-                            
-                        </div>
-                    </div>
-                    
-                    <div class="row">
-                        <a class="waves-effect waves-light btn deep-orange disabled" onclick="post()" id="recommendBtn"><i class="material-icons left">add</i>Loading...</a>
+                        <a class="waves-effect waves-light btn deep-orange disabled" onclick="save()" id="saveBtn"><i class="material-icons left">save</i>Loading...</a>
                     </div>
                 </form>
             </div>
@@ -161,6 +151,93 @@
                 };
             // Initialize Firebase
             firebase.initializeApp(firebaseConfig);
+
+            var uid;
+            var postID = window.location.search.split('?id=')[1];
+            var rating;
+            function onLoad() {
+                firebase.auth().onAuthStateChanged(function(user) {
+                    if (user) {
+                        uid = user.uid;
+
+                        firebase.database().ref('Posts/' + postID).once('value', function(snapshot) {
+                            var post = snapshot.val();
+                            if (post.author == uid) {
+                                
+                                document.getElementById('progressbar').hidden = true;
+
+                                document.getElementById('title').value = post.title;
+                                document.getElementById('category').value = post.category;
+                                document.getElementById('genre').value = post.genre || '';
+                                document.getElementById('source').value = post.source || '';
+                                document.getElementById('description').value = post.description || '';
+                                
+                                rating = post.rating;
+                                var i = 1;
+                                while (i <= rating) {
+                                    document.getElementById('star-' + i).classList += ' checked';
+                                    i++;
+                                }
+
+                                M.updateTextFields();
+                                M.textareaAutoResize($('#description'));
+
+                                document.getElementById('saveBtn').classList.remove('disabled');
+                                document.getElementById('saveBtn').innerHTML = '<i class="material-icons left">save</i>Save Post';
+                            } else {
+                                window.location.back();
+                            }
+                        });
+                    } else {
+                        redirect('login.html?from=' + window.location.href);
+                    }
+                });
+            }
+
+            function save() {
+                document.getElementById('saveBtn').classList.add('disabled');
+
+                var title = document.getElementById('title').value;
+                var description = document.getElementById('description').value || '';
+                var source = document.getElementById('source').value || '';
+                var genre = document.getElementById('genre').value || '';
+                var category = document.getElementById('category').value;
+                console.log(category);
+
+                firebase.database().ref('Posts/' + postID + '/tags').once('value', function(snapshot) {
+                    var tags = snapshot.val();
+
+                    if (title && rating) {
+                        firebase.database().ref('Users/' + firebase.auth().currentUser.uid + '/username').once('value', function(username) {
+                            var username = username.val();
+
+                            firebase.database().ref('Posts/' + postID).set({
+                                title: title,
+                                description: description,
+                                tags: tags,
+                                author: uid,
+                                source: source,
+                                rating: rating,
+                                authorname: username,
+                                genre: genre,
+                                category: category
+                            });
+                        });
+                    } else {
+                        alert('Please enter title and rating');
+                        document.getElementById('recommendBtn').classList.remove('disabled');
+                    }
+                });
+                    
+            }
+
+            function redirect(location) {
+                window.location.href = location;
+            }
+
+            $(document).ready(function(){
+                $('select').formSelect();
+            });
         </script>
     </body>
 </html>

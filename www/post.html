@@ -16,12 +16,15 @@
 
         <script>uid = JSON.parse(sessionStorage.getItem('user')).uid || '';</script>
     </head>
-    <body onload="onLoad()">
+    <body onload="onLoad()" id="body">
         <div class="navbar-fixed">
             <nav class="deep-orange" id="nav">
                 <div class="nav-wrapper">
                     <a href="index.html" class="sidenav-trigger show-on-large"><i class="material-icons">arrow_back</i></a>
                     <a href="#" class="brand-logo">View Post</a>
+                    <ul id="nav-mobile"class="right">
+                        <li><a onclick="darkToggle()"><i class="material-icons">brightness_3</i></a></li>
+                    </ul>
                 </div>
             </nav>
         </div>
@@ -31,13 +34,15 @@
                 <li><a href="account.html" class="waves-effect"><i class="material-icons">account_circle</i>Account</a></li>
           </ul>
 
-          <div class="container">
-            <div class="row" id="progressbar">
-                <div class="progress">
-                    <div class="indeterminate"></div>
+          
+        
+          <div class="container" id="container">
+                <div class="row" id="progressbar">
+                    <div class="progress">
+                        <div class="indeterminate"></div>
+                    </div>
                 </div>
-            </div>
-              <div class="row"><h4 id="title"></h2></div>
+              <div class="row"><h4 id="title" class="darkmode-text"></h2></div>
               <div class="row" hidden=true>
                   <div class="chip" id="category"></div>
               </div>
@@ -50,14 +55,14 @@
                 <span class="fa fa-star" id="star-4"></span>
                 <span class="fa fa-star" id="star-5"></span>
               </div>
-              <div class="row"><a id="author-link"><p id="author" class="flow-text" style="color: darkgrey; font-weight: bold;"></p></a></div>
+              <div class="row"><a id="author-link"><p id="author" class="flow-text darkmode-text " style="color: darkgrey; font-weight: bold;"></p></a></div>
               
               <div class="row" id="watchlist" hidden=true>
                   <button type="button" class="waves-effect btn deep-orange" id="watchlistbtn"></button>
               </div>
-              <div class="row"><p id="source" class="flow-text" style="font-weight: bolder;"></p></div>
-              <div class="row"><p id="genre" class="flow-text" style="font-weight: bolder;"></p></div>
-              <div class="row"><p id="description" class="flow-text"></p></div>
+              <div class="row"><p id="source" class="flow-text darkmode-text" style="font-weight: bolder;"></p></div>
+              <div class="row"><p id="genre" class="flow-text darkmode-text" style="font-weight: bolder;"></p></div>
+              <div class="row"><p id="description" class="flow-text darkmode-text"></p></div>
               <div class="row" id="tags"></div>
               <div class="row" id="watchrow" hidden=true>
                   <a class="waves-effect btn deep-orange" id="wheretowatch"><i class="material-icons left">open_in_new</i>Where to watch</a>
@@ -106,6 +111,9 @@
                 var postID = window.location.search.split('?id=')[1];
                 
                 function onLoad() {
+                    if (localStorage.darkmode == 'true') {
+                        darken();
+                    }
                     if (sessionStorage.getItem('user')) {
                         uid = JSON.parse(sessionStorage.getItem('user')).uid;
                         postID = window.location.search.split('?id=')[1]; 
@@ -118,6 +126,9 @@
                             } else {
                                 document.getElementById('recommend').hidden = false;
                             }
+                            if (localStorage.darkmode == 'true') {
+                    darken();
+                }
                         });
 
                         document.getElementById('watchrow').hidden = false;
@@ -132,6 +143,9 @@
                                 watchlistBtn.onclick = function() {addToWatchlist()};
                             }
                             document.getElementById('progressbar').hidden = true;
+                            if (localStorage.darkmode == 'true') {
+                    darken();
+                }
                         })
                             
 
@@ -139,6 +153,9 @@
                         
                     } else {
                         firebase.auth().onAuthStateChanged(function(user) {
+                            if (localStorage.darkmode == 'true') {
+                    darken();
+                }
                             if (user) {
                                 uid = user.uid;
 
@@ -148,7 +165,10 @@
                                     } else {
                                         document.getElementById('recommend').hidden = false;
                                     }
-                                })
+                                    if (localStorage.darkmode == 'true') {
+                    darken();
+                }
+                                });
 
                                 document.getElementById('watchrow').hidden = false;
 
@@ -162,6 +182,9 @@
                                         watchlistBtn.innerHTML = '<i class="material-icons left">playlist_add</i>Add to watchlist';
                                         watchlistBtn.onclick = function() {addToWatchlist()};
                                     }
+                                    if (localStorage.darkmode == 'true') {
+                    darken();
+                }
                                 })
                             
 
@@ -353,6 +376,45 @@
                             redirect('edit.html?id=' + postID);
                         }
                     });
+                }
+
+                function darken() {
+                    document.getElementById('body').style.backgroundColor = '#121212';
+                    Array.from(document.getElementsByClassName('card')).forEach((el) => {
+                        el.style.backgroundColor = '#292929';
+                        el.style.color = 'white';
+                        el.classList.add('z-depth-2');
+                    });
+                    Array.from(document.getElementsByClassName('chip')).forEach((el) => {
+                        el.style.backgroundColor = '#101010';
+                        el.style.color = 'white';
+                    });
+                    document.getElementById('slide-out').style.backgroundColor = '#292929';
+                    Array.from(document.getElementsByClassName('darkmode-text')).forEach((el) => {
+                        el.style.color = '#e7e7e7';
+                    });
+                
+                    //Array.from(document.getElementsByClassName('deep-orange')).forEach((el) => {
+                        //el.classList.remove('deep-orange');
+                        //el.style.backgroundColor = '#ff7043';
+                    //});
+
+                    Array.from(document.getElementsByClassName('deep-orange-text')).forEach((el) => {
+                        el.classList.remove('deep-orange-text');
+                        el.style.color = '#ff7043';
+                    });
+                    document.getElementById('nav').classList.remove('deep-orange');
+                    document.getElementById('nav').classList.add('z-depth-3');
+                    document.getElementById('nav').style.backgroundColor = '#292929';
+                }
+
+                function darkToggle() {
+                    if (localStorage.darkmode == 'true') {
+                        localStorage.darkmode = false;
+                    } else {
+                        localStorage.darkmode = true;
+                    }
+                    window.location.reload();
                 }
             </script>
     </body>

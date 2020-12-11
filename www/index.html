@@ -9,10 +9,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="../node_modules/mobile-pull-to-refresh/dist/styles/material/style.css">
         <script src="../node_modules/mobile-pull-to-refresh/dist/pullToRefresh.js"></script>
-
-        <style>
-            
-        </style>
+        
     </head>
     <body onload="onLoad()" id="body">
         <div class="navbar-fixed">
@@ -20,24 +17,27 @@
                 <div class="nav-wrapper">
                     <a href="#" data-target="slide-out" class="sidenav-trigger show-on-large"><i class="material-icons">menu</i></a>
                     <a href="#" class="brand-logo">Home</a>
+                    <ul id="nav-mobile"class="right">
+                        <li><a onclick="darkToggle()"><i class="material-icons">brightness_3</i></a></li>
+                    </ul>
                 </div>
             </nav>
         </div>
         <ul id="slide-out" class="sidenav" id="sidenav">
             <li><div class="user-view">
                 <div class="background">
-                    <img src="img/orange.png">
+                    <img src="img/orange.png" id="sidebar-img">
                 </div>
                 
-                <a href="account.html"><span class="white-text name" id="username-nav">Username loading...</span></a>
+                <a href="account.html"><span class="white-text name " id="username-nav">Username loading...</span></a>
                 <a href="account.html"><span class="white-text email" id="email-nav">Email loading...</span></a>
             </div></li>
             <li><a href="index.html" class="waves-effect darkmode-text" ><i class="material-icons darkmode-text">home</i>Home</a></li>
             <li><a href="friends.html" class="waves-effect darkmode-text" ><i class="material-icons darkmode-text" >groups</i>Friends</a></li>
-            <li><a href="watchlist.html" class="waves-effect"><i class="material-icons darkmode-text">list</i>Watchlist</a></li>
+            <li><a href="watchlist.html" class="waves-effect darkmode-text"><i class="material-icons darkmode-text">list</i>Watchlist</a></li>
             <li><a href="account.html" class="waves-effect darkmode-text" ><i class="material-icons darkmode-text" >account_circle</i>Account</a></li>
             <li><div class="divider"></div></li>
-            <li><a href="https://gitreports.com/issue/Xjarlie/tv-recommend" class="waves-effect" style="font-weight: bold;"><i class="material-icons">warning</i>Feedback</a></li>
+            <li><a href="https://gitreports.com/issue/Xjarlie/tv-recommend" class="waves-effect darkmode-text" style="font-weight: bold;"><i class="material-icons darkmode-text">warning</i>Feedback</a></li>
         </ul>
           
 
@@ -57,7 +57,7 @@
         </div>
 
         <div class="fixed-action-btn" id="fab">
-            <a class="btn-floating btn-large deep-orange" onclick="redirect('newpost.html')">
+            <a class="btn-floating btn-large deep-orange" onclick="redirect('newpost.html')" id="fabstyle">
                 <i class="large material-icons">mode_edit</i>
             </a>
         </div>
@@ -96,6 +96,9 @@
             firebase.initializeApp(firebaseConfig);
             var uid;
             function onLoad() {
+                if (localStorage.darkmode == 'true') {
+                    darken();
+                }
                 if (sessionStorage.user) {
                     uid = JSON.parse(sessionStorage.getItem('user')).uid;
                     showInfo(JSON.parse(sessionStorage.getItem('user')));
@@ -218,6 +221,9 @@
                 card.innerHTML = '<a href=# style="color: black; font-weight: bold;" onclick="openPost(\'' + postKey + '\')"><div class="card"><div class="card-content"><span class="card-title" style="font-weight: bold;">' + post.title + '</span><div class="chip">' + category + '</div><p class="deep-orange-text">' + username + '</p></div></div></a>';
                 document.getElementById('collection').prepend(card);
                 document.getElementById('nothing').hidden = true;
+                if (localStorage.darkmode == 'true') {
+                    darken();
+                }
             }
 
             function search(key, array) {
@@ -229,6 +235,7 @@
             }
 
             function openPost(key) {
+                M.toast({html: 'Loading...'});
                 document.getElementById('progressbar').hidden = false;
                 firebase.database().ref('Posts/' + key).once('value', function(snapshot) {
                     sessionStorage.setItem('activepost', JSON.stringify(snapshot.val()));
@@ -238,7 +245,32 @@
 
             function darken() {
                 document.getElementById('body').style.backgroundColor = '#121212';
-                document.getElementById('nav', 'fab').classList.add('darken-3');
+                Array.from(document.getElementsByClassName('card')).forEach((el) => {
+                    el.style.backgroundColor = '#292929';
+                    el.style.color = 'white';
+                    el.classList.add('z-depth-2');
+                });
+                Array.from(document.getElementsByClassName('chip')).forEach((el) => {
+                    el.style.backgroundColor = '#101010';
+                    el.style.color = 'white';
+                });
+                document.getElementById('slide-out').style.backgroundColor = '#292929';
+                Array.from(document.getElementsByClassName('darkmode-text')).forEach((el) => {
+                    el.style.color = '#e7e7e7';
+                });
+                document.getElementById('sidebar-img').src = 'img/darkmode-orange.png';
+                
+                Array.from(document.getElementsByClassName('deep-orange')).forEach((el) => {
+                    el.classList.remove('deep-orange');
+                    el.style.backgroundColor = '#ff7043';
+                });
+                Array.from(document.getElementsByClassName('deep-orange-text')).forEach((el) => {
+                    el.classList.remove('deep-orange-text');
+                    el.style.color = '#ff7043';
+                });
+                document.getElementById('nav').classList.remove('deep-orange');
+                document.getElementById('nav').classList.add('z-depth-3');
+                document.getElementById('nav').style.backgroundColor = '#292929';
             }
 
 
@@ -248,7 +280,16 @@
                     firebase.database().ref('Users/' + data.val().author + '/username').once('value', function(snapshot) {
                         firebase.database().ref('Posts/' + key + '/authorname').set(snapshot.val());
                     });
-                })
+                });
+            }
+
+            function darkToggle() {
+                if (localStorage.darkmode == 'true') {
+                    localStorage.darkmode = false;
+                } else {
+                    localStorage.darkmode = true;
+                }
+                window.location.reload();
             }
         </script>
 

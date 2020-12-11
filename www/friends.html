@@ -8,19 +8,22 @@
         <link rel="manifest" href="manifest.json">
         <meta name="viewport" content="width=device-width, initial-scale=1">
     </head>
-    <body onload="onLoad()">
+    <body onload="onLoad()" id="body">
         <div class="navbar-fixed">
             <nav class="deep-orange" id="nav">
                 <div class="nav-wrapper">
                     <a href="#" data-target="slide-out" class="sidenav-trigger show-on-large"><i class="material-icons">menu</i></a>
                     <a href="#" class="brand-logo">Friends</a>
+                    <ul id="nav-mobile"class="right">
+                        <li><a onclick="darkToggle()"><i class="material-icons">brightness_3</i></a></li>
+                    </ul>
                 </div>
             </nav>
         </div>
         <ul id="slide-out" class="sidenav" id="sidenav">
             <li><div class="user-view">
                 <div class="background">
-                    <img src="img/orange.png">
+                    <img src="img/orange.png" id="sidebar-img">
                 </div>
                 
                 <a href="account.html"><span class="white-text name" id="username-nav">Username loading...</span></a>
@@ -28,16 +31,16 @@
             </div></li>
             <li><a href="index.html" class="waves-effect darkmode-text" ><i class="material-icons darkmode-text">home</i>Home</a></li>
             <li><a href="friends.html" class="waves-effect darkmode-text" ><i class="material-icons darkmode-text" >groups</i>Friends</a></li>
-            <li><a href="watchlist.html" class="waves-effect"><i class="material-icons darkmode-text">list</i>Watchlist</a></li>
+            <li><a href="watchlist.html" class="waves-effect darkmode-text"><i class="material-icons darkmode-text">list</i>Watchlist</a></li>
             <li><a href="account.html" class="waves-effect darkmode-text" ><i class="material-icons darkmode-text" >account_circle</i>Account</a></li>
             <li><div class="divider"></div></li>
-            <li><a href="https://gitreports.com/issue/Xjarlie/tv-recommend" class="waves-effect" style="font-weight: bold;"><i class="material-icons">warning</i>Feedback</a></li>
+            <li><a href="https://gitreports.com/issue/Xjarlie/tv-recommend" class="waves-effect darkmode-text" style="font-weight: bold;"><i class="material-icons darkmode-text">warning</i>Feedback</a></li>
         </ul>
           
 
         </br>
 
-        <div class="container">
+        <div class="container" id="container">
             <div class="row" id="progressbar">
                 <div class="progress">
                     <div class="indeterminate"></div>
@@ -106,11 +109,17 @@
             }
 
                 function displayFriend(uid, name) {
-                    document.getElementById('friendlist').innerHTML += '<a href="user.html?id=' + uid + '"><li class="collection-item">' + name + '</li></a>';
+                    document.getElementById('friendlist').innerHTML += '<a href="user.html?id=' + uid + '"><li class="collection-item darkmode-text">' + name + '</li></a>';
                     document.getElementById('nothing').hidden = true;
+                    if (localStorage.darkmode == 'true') {
+                    darken();
+                }
                 }
                 
                 function onLoad() {
+                    if (localStorage.darkmode == 'true') {
+                    darken();
+                }
                     if (sessionStorage.user) {
                         var user = JSON.parse(sessionStorage.user);
                         showInfo(user);
@@ -161,6 +170,52 @@
                             });
                         });
                     });
+                }
+
+                function darken() {
+                    document.getElementById('body').style.backgroundColor = '#121212';
+                    Array.from(document.getElementsByClassName('card')).forEach((el) => {
+                        el.style.backgroundColor = '#292929';
+                        el.style.color = 'white';
+                        el.classList.add('z-depth-2');
+                    });
+                    Array.from(document.getElementsByClassName('chip')).forEach((el) => {
+                        el.style.backgroundColor = '#101010';
+                        el.style.color = 'white';
+                    });
+                    document.getElementById('slide-out').style.backgroundColor = '#292929';
+                    Array.from(document.getElementsByClassName('darkmode-text')).forEach((el) => {
+                        el.style.color = '#e7e7e7';
+                    });
+                    document.getElementById('sidebar-img').src = 'img/darkmode-orange.png';
+                
+                    Array.from(document.getElementsByClassName('deep-orange')).forEach((el) => {
+                        el.classList.remove('deep-orange');
+                        el.style.backgroundColor = '#ff7043';
+                    });
+
+                    Array.from(document.getElementsByClassName('deep-orange-text')).forEach((el) => {
+                        el.classList.remove('deep-orange-text');
+                        el.style.color = '#ff7043';
+                    });
+                    document.getElementById('nav').classList.remove('deep-orange');
+                    document.getElementById('nav').classList.add('z-depth-3');
+                    document.getElementById('nav').style.backgroundColor = '#292929';
+                    document.getElementById('friendlist').style.backgroundColor = '#292929';
+                    document.getElementById('container').style.backgroundColor = '#292929';
+                    
+                    Array.from(document.getElementsByClassName('collection-item')).forEach((el) => {
+                        el.style.backgroundColor = '#292929';
+                    });
+                }
+
+                function darkToggle() {
+                    if (localStorage.darkmode == 'true') {
+                        localStorage.darkmode = false;
+                    } else {
+                        localStorage.darkmode = true;
+                    }
+                    window.location.reload();
                 }
             </script>
     </body>

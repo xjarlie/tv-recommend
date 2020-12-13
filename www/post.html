@@ -201,7 +201,7 @@
                         
                         document.getElementById('title').innerHTML = post.title;
                         document.getElementById('author').innerHTML = post.authorname;
-                        document.getElementById('author-link').href = 'user.html?id=' + post.author;
+                        document.getElementById('author-link').href = 'profile.html?id=' + post.author;
                         document.getElementById('wheretowatch').href = 'https://justwatch.com/uk/search?q=' + post.title;
                         document.getElementById('source').innerHTML = 'Watched On: ' + post.source || '';
                         document.getElementById('description').innerHTML = post.description || '';
@@ -252,7 +252,7 @@
                             document.getElementById('author').innerHTML = snapshot2.val();
                         });
 
-                        document.getElementById('author-link').href = 'user.html?id=' + snapshot.val().author;
+                        document.getElementById('author-link').href = 'profile.html?id=' + snapshot.val().author;
                         document.getElementById('wheretowatch').href = 'https://justwatch.com/uk/search?q=' + snapshot.val().title;
 
                         document.getElementById('title').innerHTML = snapshot.val().title;
@@ -299,7 +299,9 @@
                             }
                         }
                         document.getElementById('progressbar').hidden = true;
-                        
+                        if (localStorage.darkmode == 'true') {
+                            darken();
+                        }
                     });
                     }
                 }

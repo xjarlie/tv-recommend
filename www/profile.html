@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>User - WhatsOn</title>
+        <link rel="stylesheet" href="css/style.css">
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <link type="text/css" rel="stylesheet" href="css/materialize.min.css"  media="screen,projection"/>
+        <link rel="manifest" href="manifest.json">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    </head>
+    <body onload="onLoad()" id="body">
+        <div class="navbar-fixed">
+            <nav class="deep-orange" id="nav">
+                <div class="nav-wrapper">
+                    <a onclick="window.history.back()" class="sidenav-trigger show-on-large"><i class="material-icons">arrow_back</i></a>
+                    <a href="#" class="brand-logo">Profile</a>
+                    <ul id="nav-mobile"class="right">
+                        <li><a onclick="darkToggle()"><i class="material-icons">brightness_3</i></a></li>
+                    </ul>
+                </div>
+            </nav>
+        </div>
+        </br>
+
+        <div class="container">
+            <div id="user-container">
+                <img class="circle" src="img/user.png" style="display: block; margin-left: auto; margin-right: auto; width: 30%;" id="profile-image">
+                <p style="font-size: 1rem; color: grey; text-align: center;" id="image-button" onclick="fileClick()" hidden=true>Upload new profile picture</p>
+                <input type="file" accept="image/*" id="image-input" style="display: none;">
+                <h4 id="user-display" style="text-align: center;" class="darkmode-text">Loading...</h4>
+                <div class="row" hidden=true id="friend-remove">
+                    <button type="button" class="btn deep-orange" onclick="removeFriend()">Remove friend</button>
+                </div>
+                </br>
+                <hr>
+                <div class="row" id="progressbar">
+                    <div class="progress">
+                        <div class="indeterminate"></div>
+                    </div>
+                </div>
+                <div id="post-display">
+                    <div class="row center-align" id="nothing">
+                        <h5 class="darkmode-text">Nothing here</h5>
+                        <h6 class="darkmode-text">This user has no posts yet</h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="jquery.min.js"></script>
+        <!-- The core Firebase JS SDK is always required and must be listed first -->
+        <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-app.js"></script>
+
+        <!-- TODO: Add SDKs for Firebase products that you want to use
+            https://firebase.google.com/docs/web/setup#available-libraries -->
+            <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-auth.js"></script>
+            <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-database.js"></script>
+            <script src="https://www.gstatic.com/firebasejs/8.1.2/firebase-storage.js"></script>
+
+            <script type="text/javascript" src="js/materialize.min.js"></script>
+        
+        <script>
+            // Your web app's Firebase configuration
+            var firebaseConfig = {
+                apiKey: "AIzaSyDoxnxXrZrkmvwxqvGOd0HKxwMJgLHum_I",
+                authDomain: "lwttv-8fcd8.firebaseapp.com",
+                databaseURL: "https://lwttv-8fcd8.firebaseio.com",
+                projectId: "lwttv-8fcd8",
+                storageBucket: "lwttv-8fcd8.appspot.com",
+                messagingSenderId: "326986084837",
+                appId: "1:326986084837:web:56b983ce9bab9e397f7f0c"
+            };
+            // Initialize Firebase
+            firebase.initializeApp(firebaseConfig);
+
+            var userID;
+            function onLoad() {
+
+                if (localStorage.darkmode == 'true') {
+                    darken();
+                    document.getElementById('profile-image').src = 'img/user-darkmode.png';
+                }
+
+                userID = window.location.search.split('?id=')[1];
+
+                firebase.auth().onAuthStateChanged(function(user) {
+                    if (user) {
+                        
+                        if (!userID) {
+                            userID = user.uid;
+                        }
+
+                        if (user.uid == userID) {
+                            document.getElementById('image-button').hidden = false;
+                        }
+
+                        firebase.database().ref('Users/' + userID + '/username').once('value', function(snapshot) {
+                            document.getElementById('user-display').innerHTML = snapshot.val();
+                        });
+
+                        firebase.storage().ref('Users/' + userID + '/profile').getDownloadURL().then(function(url) {
+                            if (url) {
+                                document.getElementById('profile-image').src = url;
+                            }
+                        });
+
+                        displayPosts();
+                        document.getElementById('progressbar').hidden = true;
+                    } else {
+                        redirect('login.html?source=' + window.location.href);
+                    }
+                });
+            }
+
+            function displayPosts() {
+                firebase.database().ref('Users/' + userID + '/Posts').on('child_added', function(data) {
+                    var postKey = data.key;
+                    firebase.database().ref('Posts/' + data.val()).once('value', function(snapshot) {
+                        var post = document.createElement('div');
+                        post.classList.add('row');
+                        post.innerHTML = '<a href=post.html?id=' + data.val() + ' style="color: black; font-weight: bold;"><div class="card"><div class="card-content"><span class="card-title">' + snapshot.val().title + '</span></div></div></a>';
+                        document.getElementById('post-display').appendChild(post);
+                        document.getElementById('nothing').hidden = true;
+                        if (localStorage.darkmode == 'true') {
+                    darken();
+                }
+                    });
+                });
+            }
+
+            function fileClick() {
+                document.getElementById('image-input').click();
+            }
+
+            document.getElementById('image-input').addEventListener('change', function (e) {
+                M.toast({html: 'Loading...'});
+                var file = this.files[0];
+                if (file) {
+                    firebase.storage().ref('Users/' + userID + '/profile').put(file).then(function() {
+                        window.location.reload();
+                    });
+                }
+            }, false);
+
+            function darken() {
+                    document.getElementById('body').style.backgroundColor = '#121212';
+                    Array.from(document.getElementsByClassName('card')).forEach((el) => {
+                        el.style.backgroundColor = '#292929';
+                        el.style.color = 'white';
+                        el.classList.add('z-depth-2');
+                    });
+                    Array.from(document.getElementsByClassName('chip')).forEach((el) => {
+                        el.style.backgroundColor = '#101010';
+                        el.style.color = 'white';
+                    });
+                    Array.from(document.getElementsByClassName('darkmode-text')).forEach((el) => {
+                        el.style.color = '#e7e7e7';
+                    });
+                
+                    Array.from(document.getElementsByClassName('deep-orange')).forEach((el) => {
+                        el.classList.remove('deep-orange');
+                        el.style.backgroundColor = '#ff7043';
+                    });
+
+                    Array.from(document.getElementsByClassName('deep-orange-text')).forEach((el) => {
+                        el.classList.remove('deep-orange-text');
+                        el.style.color = '#ff7043';
+                    });
+                    document.getElementById('nav').classList.remove('deep-orange');
+                    document.getElementById('nav').classList.add('z-depth-3');
+                    document.getElementById('nav').style.backgroundColor = '#292929';
+                }
+
+                function darkToggle() {
+                    if (localStorage.darkmode == 'true') {
+                        localStorage.darkmode = false;
+                    } else {
+                        localStorage.darkmode = true;
+                    }
+                    window.location.reload();
+                }
+
+                document.addEventListener('DOMContentLoaded', function() {
+                var elems = document.querySelectorAll('.sidenav');
+                var instances = M.Sidenav.init(elems);
+            });
+
+            
+        </script>
+    </body>
+</html>

@@ -109,7 +109,7 @@
             }
 
                 function displayFriend(uid, name) {
-                    document.getElementById('friendlist').innerHTML += '<a href="user.html?id=' + uid + '"><li class="collection-item darkmode-text">' + name + '</li></a>';
+                    document.getElementById('friendlist').innerHTML += '<a href="profile.html?id=' + uid + '"><li class="collection-item darkmode-text">' + name + '</li></a>';
                     document.getElementById('nothing').hidden = true;
                     if (localStorage.darkmode == 'true') {
                     darken();

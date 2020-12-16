@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Home - WhatsOn</title>
+        <link rel="stylesheet" href="css/style.css">
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <link type="text/css" rel="stylesheet" href="css/materialize.min.css"  media="screen,projection"/>
+        <link rel="manifest" href="manifest.json">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="../node_modules/mobile-pull-to-refresh/dist/styles/material/style.css">
+        <script src="../node_modules/mobile-pull-to-refresh/dist/pullToRefresh.js"></script>
+    </head>
+    <body onload='onLoad()' id="body">
+        <div class="navbar-fixed">
+            <nav class="deep-orange" id="nav">
+                <div class="nav-wrapper">
+                    <a href="#" data-target="slide-out" class="sidenav-trigger show-on-large"><i class="material-icons">menu</i></a>
+                    <a href="#" class="brand-logo">Settings</a>
+                    <ul id="nav-mobile"class="right">
+                        <li><a onclick="darkToggle()"><i class="material-icons">brightness_3</i></a></li>
+                    </ul>
+                </div>
+            </nav>
+        </div>
+        <ul id="slide-out" class="sidenav" id="sidenav">
+            <li><div class="user-view">
+                <div class="background">
+                    <img src="img/orange.png" id="sidebar-img">
+                </div>
+                
+                <a href="account.html"><span class="white-text name " id="username-nav">Username loading...</span></a>
+                <a href="account.html"><span class="white-text email" id="email-nav">Email loading...</span></a>
+            </div></li>
+            <li><a href="index.html" class="waves-effect darkmode-text" ><i class="material-icons darkmode-text">home</i>Home</a></li>
+            <li><a href="friends.html" class="waves-effect darkmode-text" ><i class="material-icons darkmode-text" >groups</i>Friends</a></li>
+            <li><a href="watchlist.html" class="waves-effect darkmode-text"><i class="material-icons darkmode-text">list</i>Watchlist</a></li>
+            <li><a href="profile.html" class="waves-effect darkmode-text" ><i class="material-icons darkmode-text" >account_circle</i>Profile</a></li>
+            <li><div class="divider"></div></li>
+            <li><a href="settings.html" class="waves-effect darkmode-text"><i class="material-icons darkmode-text">settings</i>Settings</a></li>
+            <li><a href="https://gitreports.com/issue/Xjarlie/tv-recommend" class="waves-effect darkmode-text" style="font-weight: bold;"><i class="material-icons darkmode-text">warning</i>Feedback</a></li>
+        </ul>
+    </br>
+
+        <div class="container">
+            <div class="row">
+                <div class="card switch">
+                    <div class="card-content">
+                        <span class="card-title">
+                            Dark mode
+                            <div class="right">
+                                <label>       
+                                    <input type="checkbox">
+                                    <span class="lever"></span>
+                                </label>
+                            </div>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- The core Firebase JS SDK is always required and must be listed first -->
+        <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-app.js"></script>
+
+        <!-- TODO: Add SDKs for Firebase products that you want to use
+            https://firebase.google.com/docs/web/setup#available-libraries -->
+            <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-auth.js"></script>
+            <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-database.js"></script>
+
+            <script type="text/javascript" src="js/materialize.min.js"></script>
+
+            <script src="serviceWorker1/pwabuilder-sw-register.js" type="module"></script>
+            <script src="serviceWorker1/pwabuilder-sw.js"></script>
+
+            <link rel="stylesheet" href="lib/ptrLight.css">
+            <script src="https://code.jquery.com/jquery-2.2.3.min.js" type="text/javascript"></script>
+            <script src="lib/ptrLight.js"></script>
+        
+        <script>
+            // Your web app's Firebase configuration
+            var firebaseConfig = {
+                apiKey: "AIzaSyDoxnxXrZrkmvwxqvGOd0HKxwMJgLHum_I",
+                authDomain: "lwttv-8fcd8.firebaseapp.com",
+                databaseURL: "https://lwttv-8fcd8.firebaseio.com",
+                projectId: "lwttv-8fcd8",
+                storageBucket: "lwttv-8fcd8.appspot.com",
+                messagingSenderId: "326986084837",
+                appId: "1:326986084837:web:56b983ce9bab9e397f7f0c"
+            };
+            // Initialize Firebase
+            firebase.initializeApp(firebaseConfig);
+
+            document.addEventListener('DOMContentLoaded', function() {
+                var elems = document.querySelectorAll('.sidenav');
+                var instances = M.Sidenav.init(elems);
+            });
+
+
+        </script>
+    </body>
+</html>

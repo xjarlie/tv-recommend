@@ -15,7 +15,7 @@
                     <a onclick="window.history.back()" class="sidenav-trigger show-on-large"><i class="material-icons">arrow_back</i></a>
                     <a href="#" class="brand-logo">Profile</a>
                     <ul id="nav-mobile"class="right">
-                        <li><a onclick="darkToggle()"><i class="material-icons">brightness_3</i></a></li>
+                        <li><a onclick="refresh()"><i class="material-icons">refresh</i></a></li>
                     </ul>
                 </div>
             </nav>
@@ -185,7 +185,10 @@
                 var instances = M.Sidenav.init(elems);
             });
 
-            
+            function refresh() {
+                sessionStorage.clear();
+                window.location.reload();
+            }
         </script>
     </body>
 </html>

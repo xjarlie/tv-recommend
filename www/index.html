@@ -18,7 +18,7 @@
                     <a href="#" data-target="slide-out" class="sidenav-trigger show-on-large"><i class="material-icons">menu</i></a>
                     <a href="#" class="brand-logo">Home</a>
                     <ul id="nav-mobile"class="right">
-                        <li><a onclick="darkToggle()"><i class="material-icons">brightness_3</i></a></li>
+                        <li><a onclick="refresh()"><i class="material-icons">refresh</i></a></li>
                     </ul>
                 </div>
             </nav>
@@ -284,12 +284,8 @@
                 });
             }
 
-            function darkToggle() {
-                if (localStorage.darkmode == 'true') {
-                    localStorage.darkmode = false;
-                } else {
-                    localStorage.darkmode = true;
-                }
+            function refresh() {
+                sessionStorage.clear();
                 window.location.reload();
             }
         </script>

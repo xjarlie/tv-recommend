@@ -6,4 +6,4 @@ WhatsOn is a web/android app for recommending TV and films to friends - it inclu
 - Web live demo link: https://tv.xjarlie.com
 
 ## Technical information
-WhatsOn is built using HTML, CSS and JavaScript and uses Apache Cordova for native app conversion.
+WhatsOn is built using native web technologies (HTML, CSS and JavaScript) as opposed to frameworks such as React, Angular or Vue.

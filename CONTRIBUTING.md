@@ -9,6 +9,9 @@ If the issue relates to account or database security, please disclose this via e
 ### I think there's something that can be improved, what should I do?
 If there's something that you think could be made better (by you or someone else) please feel free to submit a Github Issue using the 'Feature request' template.
 
+### I have ideas relating to an existing issue, what should I do?
+If you have ideas or suggestions to add on to an existing Github Issue, post them as comments below the issue and they will be taken into account by the person working on the issue.
+
 ## Contributing code
 
 ### Pull requests

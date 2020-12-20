@@ -7,72 +7,28 @@
         <link type="text/css" rel="stylesheet" href="css/materialize.min.css"  media="screen,projection"/>
         <link rel="manifest" href="manifest.json">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="../node_modules/mobile-pull-to-refresh/dist/styles/material/style.css">
+        <script src="../node_modules/mobile-pull-to-refresh/dist/pullToRefresh.js"></script>
     </head>
-    <body onload="onLoad()" style="width: 100%;">
-        <nav class="deep-orange">
-            <div class="nav-wrapper">
-              <a href="#" class="brand-logo">Add Friend</a>
-              <a href="friends.html" class="sidenav-trigger"><i class="material-icons">arrow_back</i></a>
-              <ul id="nav-mobile" class="right hide-on-med-and-down">
+    <body id="body" onload="onLoad()">
+        <div class="navbar-fixed">
+            <nav class="deep-orange" id="nav">
+                <div class="nav-wrapper">
+                    <a onclick="window.history.back()" class="sidenav-trigger show-on-large"><i class="material-icons">arrow_back</i></a>
+                    <a href="#" class="brand-logo">Add Friend</a>
+                    <ul id="nav-mobile"class="right">
+                        <li><a onclick="refresh()"><i class="material-icons">refresh</i></a></li>
+                    </ul>
+                </div>
+            </nav>
+        </div>
+          <ul id="slide-out" class="sidenav">
                 <li><a href="index.html" class="waves-effect"><i class="material-icons">home</i>Home</a></li>
                 <li><a href="friends.html" class="waves-effect"><i class="material-icons">groups</i>Friends</a></li>
                 <li><a href="account.html" class="waves-effect"><i class="material-icons">account_circle</i>Account</a></li>
-                
-              </ul>
-              
-            </div>
-        </nav>
-        <ul id="slide-out" class="sidenav">
-            <li><a href="index.html" class="waves-effect"><i class="material-icons">home</i>Home</a></li>
-            <li><a href="friends.html" class="waves-effect"><i class="material-icons">groups</i>Friends</a></li>
-            <li><a href="account.html" class="waves-effect"><i class="material-icons">account_circle</i>Account</a></li>
-        </ul>
-    </br>
-        <div id="qrcode" style="margin: auto; width: 50%; padding: 10px;">
-            <div class="preloader-wrapper big active">
-                <div class="spinner-layer spinner-blue">
-                  <div class="circle-clipper left">
-                    <div class="circle"></div>
-                  </div><div class="gap-patch">
-                    <div class="circle"></div>
-                  </div><div class="circle-clipper right">
-                    <div class="circle"></div>
-                  </div>
-                </div>
-          
-                <div class="spinner-layer spinner-red">
-                  <div class="circle-clipper left">
-                    <div class="circle"></div>
-                  </div><div class="gap-patch">
-                    <div class="circle"></div>
-                  </div><div class="circle-clipper right">
-                    <div class="circle"></div>
-                  </div>
-                </div>
-<<<<<<< Updated upstream
-          
-                <div class="spinner-layer spinner-yellow">
-                  <div class="circle-clipper left">
-                    <div class="circle"></div>
-                  </div><div class="gap-patch">
-                    <div class="circle"></div>
-                  </div><div class="circle-clipper right">
-                    <div class="circle"></div>
-                  </div>
-                </div>
-          
-                <div class="spinner-layer spinner-green">
-                  <div class="circle-clipper left">
-                    <div class="circle"></div>
-                  </div><div class="gap-patch">
-                    <div class="circle"></div>
-                  </div><div class="circle-clipper right">
-                    <div class="circle"></div>
-                  </div>
-                </div>
-              </div>
-=======
-            </div>
+          </ul>
+
+        <div class="container">
             <div class="row">
                 <div class="input-field">
                     <i class="material-icons prefix">person_search</i>
@@ -83,16 +39,8 @@
             <div class="row">
                 <button type="button" class="btn deep-orange waves-effect" style="width: 100%;" onclick="sendRequest()" id="requestBtn">Send friend request</button>
             </div>
->>>>>>> Stashed changes
         </div>
 
-        <div class="row">
-            <p class="deep-orange-text">Get your friends to scan the QR code above, or send them the link below:</p>
-            <p class="deep-orange-text" id="linkdisplay"></p>
-        </div>
-        <div class="row">
-            <button type="button" class="waves-effect btn deep-orange" onclick="copyLink()">Copy to Clipboard</button>
-        </div>
         <!-- The core Firebase JS SDK is always required and must be listed first -->
         <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-app.js"></script>
 
@@ -101,99 +49,28 @@
             <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-auth.js"></script>
             <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-database.js"></script>
 
-            <script src="qrcode.js"></script>
             <script type="text/javascript" src="js/materialize.min.js"></script>
 
-            <script>
-                // Your web app's Firebase configuration
-                var firebaseConfig = {
-                    apiKey: "AIzaSyDoxnxXrZrkmvwxqvGOd0HKxwMJgLHum_I",
-                    authDomain: "lwttv-8fcd8.firebaseapp.com",
-                    databaseURL: "https://lwttv-8fcd8.firebaseio.com",
-                    projectId: "lwttv-8fcd8",
-                    storageBucket: "lwttv-8fcd8.appspot.com",
-                    messagingSenderId: "326986084837",
-                    appId: "1:326986084837:web:56b983ce9bab9e397f7f0c"
-                };
-                // Initialize Firebase
-                firebase.initializeApp(firebaseConfig);
-                
-                document.addEventListener('DOMContentLoaded', function() {
-                    var elems = document.querySelectorAll('.sidenav');
-                    var instances = M.Sidenav.init(elems);
-                });
+            <script src="serviceWorker1/pwabuilder-sw-register.js" type="module"></script>
+            <script src="serviceWorker1/pwabuilder-sw.js"></script>
 
-                function redirect(location) {
-                    window.location.href = location;
-                }
+            <link rel="stylesheet" href="lib/ptrLight.css">
+            <script src="https://code.jquery.com/jquery-2.2.3.min.js" type="text/javascript"></script>
+            <script src="lib/ptrLight.js"></script>
+        <script>
+            // Your web app's Firebase configuration
+            var firebaseConfig = {
+                apiKey: "AIzaSyDoxnxXrZrkmvwxqvGOd0HKxwMJgLHum_I",
+                authDomain: "lwttv-8fcd8.firebaseapp.com",
+                databaseURL: "https://lwttv-8fcd8.firebaseio.com",
+                projectId: "lwttv-8fcd8",
+                storageBucket: "lwttv-8fcd8.appspot.com",
+                messagingSenderId: "326986084837",
+                appId: "1:326986084837:web:56b983ce9bab9e397f7f0c"
+            };
+            // Initialize Firebase
+            firebase.initializeApp(firebaseConfig);
 
-                function onLoad() {
-                    var uid;
-                    firebase.auth().onAuthStateChanged(function(user) {
-                    if (user) {
-                        // User is signed in.
-                        var displayName = user.displayName;
-                        var email = user.email;
-                        var emailVerified = user.emailVerified;
-                        var photoURL = user.photoURL;
-                        var isAnonymous = user.isAnonymous;
-                        uid = user.uid;
-                        var providerData = user.providerData;
-                        // ...
-
-
-                        if (window.location.search) {
-                            var friendID = window.location.search.split('?friend=')[1];
-                            firebase.database().ref('Users/' + uid + '/Friends/' + friendID).once('value', function(snapshot) {
-                                if (snapshot.val()) {
-                                  redirect('friends.html');
-                                } else {
-                                  firebase.database().ref('Users/' + friendID + '/username').once('value', function(snapshot) {
-                                    firebase.database().ref('Users/' + uid + '/Friends/' + friendID).set(snapshot.val());
-                                    firebase.database().ref('Users/' + uid + '/username').once('value', function(snapshot2) {
-                                      firebase.database().ref('Users/' + friendID + '/Friends/' + uid).set(snapshot2.val());
-
-                                      sessionStorage.removeItem('friends');
-
-                                      if (confirm('Friend added! Proceed to friend list?')) {
-                                        redirect('friends.html');
-                                      } else {
-                                        M.toast({html: 'Friend added'});
-                                      }
-                                    })
-                                    
-                                  });
-
-                                }
-                            });
-                        
-
-                        } else {
-                            document.getElementById('qrcode').innerHTML = '';
-                            var url = "https://tv.xjarlie.com/addfriend.html?friend=" + uid;
-                            new QRCode(document.getElementById("qrcode"), url);
-                            document.getElementById('linkdisplay').innerHTML = url;
-                        }
-                    } else {
-                        redirect('login.html?source=' + window.location.href);
-                    }
-                    });
-
-                    
-                    
-                
-                }
-
-                function copyLink() {
-                    navigator.clipboard.writeText(document.getElementById('linkdisplay').innerHTML).then(function() {
-                        alert('Link copied');
-                    });
-                }
-            </script>
-
-<<<<<<< Updated upstream
-        
-=======
             function refresh() {
                 sessionStorage.clear();
                 window.location.reload();
@@ -239,6 +116,5 @@
                 }
             }
         </script>
->>>>>>> Stashed changes
     </body>
 </html>

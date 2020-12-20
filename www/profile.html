@@ -31,6 +31,9 @@
                 <div class="row" hidden=true id="friend-remove">
                     <button type="button" class="btn deep-orange" onclick="removeFriend()">Remove friend</button>
                 </div>
+                <div class="row" id="account-settings" hidden=true>
+                    <button type="button" class="btn deep-orange" onclick="redirect('settings.html')" style="display: block; margin-left: auto; margin-right: auto;"><i class="material-icons left">open_in_new</i>Account settings</button>
+                </div>
                 </br>
                 <hr>
                 <div class="row" id="progressbar">
@@ -92,6 +95,7 @@
 
                         if (user.uid == userID) {
                             document.getElementById('image-button').hidden = false;
+                            document.getElementById('account-settings').hidden = false;
                         } else {
                             //document.getElementById('friend-remove').hidden = false;
                         }
@@ -190,6 +194,10 @@
             function refresh() {
                 sessionStorage.clear();
                 window.location.reload();
+            }
+
+            function redirect(location) {
+                window.location.href = location;
             }
         </script>
     </body>

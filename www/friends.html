@@ -88,7 +88,7 @@
                 };
                 // Initialize Firebase
                 firebase.initializeApp(firebaseConfig);
-                
+                var userglobal;
                 document.addEventListener('DOMContentLoaded', function() {
                     var elems = document.querySelectorAll('.sidenav');
                     var instances = M.Sidenav.init(elems);
@@ -120,12 +120,13 @@
                     darken();
                 }
                 }
-                
+               
                 function onLoad() {
                     if (localStorage.darkmode == 'true') {
                     darken();
                 }
                     if (sessionStorage.user) {
+                        userglobal = JSON.parse(sessionStorage.user);
                         var user = JSON.parse(sessionStorage.user);
                         showRequests(user);
                         showInfo(user);
@@ -150,7 +151,7 @@
                         firebase.auth().onAuthStateChanged(function(user) {
                             if (user) {
                                 showInfo(user);
-
+                                userglobal = user;
                                 firebase.database().ref('Users/' + user.uid + '/Friends').on('child_added', function(data) {
                                     displayFriend(data.key, data.val());
                                 });
@@ -171,9 +172,17 @@
                 }
 
                 function showRequests(user) {
-                    firebase.database().ref('User/' + user.uid + '/Requests').on('child_added', function(child) {
-                        
+                    firebase.database().ref('Users/' + user.uid + '/Requests').on('child_added', function(child) {
+                        displayRequest(child.val(), child.key);
                     });
+                }
+
+                function displayRequest(name, uid) {
+                    console.log('here');
+                    var request = document.createElement('a');
+                    request.href = 'profile.html?id=' + uid;
+                    request.innerHTML = '<li class="collection-item darkmode-text"><div>' + name + '<a href="#" class="secondary-content" onclick="rejectFriend(\'' + uid + '\')"><i class="material-icons red-text">clear</i></a><a href="#!" class="secondary-content" style="padding-right: 1rem;" onclick="acceptFriend(\'' + uid + '\', \'' + name + '\')"><i class="material-icons green-text">done</i></a></div></li>';
+                    document.getElementById('requestlist').prepend(request);
                 }
 
                 function addUsernameToFriends() {
@@ -217,7 +226,7 @@
                     document.getElementById('nav').style.backgroundColor = '#292929';
                     document.getElementById('friendlist').style.backgroundColor = '#292929';
                     document.getElementById('requestlist').style.backgroundColor = '#292929';
-                    document.getElementById('container').style.backgroundColor = '#292929';
+                    //document.getElementById('container').style.backgroundColor = '#292929';
                     
                     Array.from(document.getElementsByClassName('collection-item')).forEach((el) => {
                         el.style.backgroundColor = '#292929';
@@ -227,6 +236,24 @@
                 function refresh() {
                     sessionStorage.clear();
                     window.location.reload();
+                }
+
+                function rejectFriend(uid) {
+                    firebase.database().ref('Users/' + userglobal.uid + '/Requests/' + uid).remove();
+                    window.location.reload();
+                }
+
+                function acceptFriend(uid, name) {
+                    firebase.database().ref('Users/' + userglobal.uid + '/Friends/' + uid).set(name).then(function() { 
+                        firebase.database().ref('Users/' + userglobal.uid + '/Requests/' + uid).remove().then(function() {
+                            firebase.database().ref('Users/' + userglobal.uid + '/username').once('value', function(snapshot) {
+                                firebase.database().ref('Users/' + uid + '/Friends/' + userglobal.uid).set(snapshot.val()).then(function() {
+                                    M.toast({html: 'Loading...'});
+                                    refresh();
+                                });
+                            });
+                        });
+                    });
                 }
             </script>
     </body>

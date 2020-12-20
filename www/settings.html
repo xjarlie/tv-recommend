@@ -10,7 +10,7 @@
         <link rel="stylesheet" href="../node_modules/mobile-pull-to-refresh/dist/styles/material/style.css">
         <script src="../node_modules/mobile-pull-to-refresh/dist/pullToRefresh.js"></script>
     </head>
-    <body id="body">
+    <body id="body" onload="onLoad()">
         <div class="navbar-fixed">
             <nav class="deep-orange" id="nav">
                 <div class="nav-wrapper">
@@ -39,6 +39,36 @@
     </br>
 
         <div class="container">
+            <div class="row">
+                <div class="card">
+                    <div class="card-content">
+                        <span class="card-title">Account</span>
+                        <div class="row">
+                            <div class="input-field">
+                                <i class="material-icons prefix darkmode-text">account_circle</i>
+                                <input disabled id="username" type="text" class="darkmode-text">
+                                <label for="username" id="usernamelabel" class="darkmode-text">Username Loading...</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field">
+                                <i class="material-icons prefix darkmode-text">email</i>
+                                <input disabled id="email" type="email" class="darkmode-text">
+                                <label for="email" id="emaillabel" class="darkmode-text">Email Address Loading...</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <a class="waves-effect btn deep-orange disabled" id="viewUserBtn"><i class="material-icons left">open_in_new</i>View my profile</a>
+                        </div>
+                        <div class="row">
+                            <a class="waves-effect waves-light btn deep-orange disabled" onclick="resetPass()" id="resetPassBtn"><i class="material-icons left">lock</i>Reset password</a>
+                        </div>
+                        <div class="row">
+                            <button class="btn waves-effect red darken-4 disabled" onclick="signOut()" id="signOutBtn"><i class="material-icons left">exit_to_app</i>Sign Out</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="row">
                 <div class="card switch">
                     <div class="card-content">
@@ -136,6 +166,65 @@
                 document.getElementById('nav').classList.remove('deep-orange');
                 document.getElementById('nav').classList.add('z-depth-3');
                 document.getElementById('nav').style.backgroundColor = '#292929';
+            }
+
+            function onLoad() {
+                if (sessionStorage.user) {
+                    showInfo(JSON.parse(sessionStorage.user));
+                } else {
+                    firebase.auth().onAuthStateChanged(function(user) {
+                        if (user) {
+                            showInfo(user);
+                        } else {
+                            redirect('login.html?source=' + window.location.href);
+                        }
+                    })
+                }
+            }
+
+            function showInfo(user) {
+                document.getElementById('resetPassBtn').classList.remove('disabled');
+                document.getElementById('signOutBtn').classList.remove('disabled');
+
+                if (sessionStorage.getItem('email') && sessionStorage.getItem('username')) {
+                    document.getElementById('username-nav').innerHTML = sessionStorage.getItem('username');
+                    document.getElementById('email-nav').innerHTML = sessionStorage.getItem('email');
+                    document.getElementById('usernamelabel').innerHTML = sessionStorage.getItem('username');
+                    document.getElementById('emaillabel').innerHTML = sessionStorage.getItem('email');
+                } else {
+                    firebase.database().ref('Users/' + user.uid + '/username').once('value', function(snapshot) {
+                        document.getElementById('username-nav').innerHTML = snapshot.val();
+                        document.getElementById('email-nav').innerHTML = user.email;
+                        document.getElementById('usernamelabel').innerHTML = snapshot.val();
+                        document.getElementById('emaillabel').innerHTML = user.email;
+
+                        sessionStorage.setItem('username', snapshot.val());
+                        sessionStorage.setItem('email', user.email);
+                    });
+                }
+
+                document.getElementById('viewUserBtn').href = 'profile.html';
+                document.getElementById('viewUserBtn').classList.remove('disabled');
+            }
+
+            function redirect(location) {
+                window.location.href = location;
+            }
+
+            function resetPass() {
+                var email = firebase.auth().currentUser.email;
+                firebase.auth().sendPasswordResetEmail(email).then(function() {
+                    alert('Password reset email sent!')
+                }).catch(function(error) {
+                    alert(error.message);
+                });
+            }
+
+            function signOut() {
+                if (confirm('Are you sure you want to sign out of your account?')) {
+                    sessionStorage.clear();
+                    firebase.auth().signOut();
+                }
             }
         </script>
     </body>

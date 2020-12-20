@@ -49,6 +49,7 @@
                     <div class="circle"></div>
                   </div>
                 </div>
+<<<<<<< Updated upstream
           
                 <div class="spinner-layer spinner-yellow">
                   <div class="circle-clipper left">
@@ -70,6 +71,19 @@
                   </div>
                 </div>
               </div>
+=======
+            </div>
+            <div class="row">
+                <div class="input-field">
+                    <i class="material-icons prefix">person_search</i>
+                    <input type="text" id="username-input">
+                    <label for="username-input">Enter Friend's Username</label>
+                </div>
+            </div>
+            <div class="row">
+                <button type="button" class="btn deep-orange waves-effect" style="width: 100%;" onclick="sendRequest()" id="requestBtn">Send friend request</button>
+            </div>
+>>>>>>> Stashed changes
         </div>
 
         <div class="row">
@@ -177,6 +191,54 @@
                 }
             </script>
 
+<<<<<<< Updated upstream
         
+=======
+            function refresh() {
+                sessionStorage.clear();
+                window.location.reload();
+            }
+
+            var userglobal;
+            function onLoad() {
+                if (sessionStorage.user) {
+                    userglobal = JSON.parse(sessionStorage.user);
+                } else {
+                    firebase.auth().onAuthStateChanged(function(user) {
+                        if (user) {
+                            userglobal = user;
+                        } else {
+                            redirect('login.html?source=' + window.location.href);
+                        }
+                    });
+                }
+            }
+
+            function addUsernamesToList() {
+                firebase.database().ref('Users').on('child_added', function(child) {
+                    firebase.database().ref('Usernames/' + child.val().username).set(child.val().username);
+                });
+            }
+
+            function sendRequest() {
+                var friendUsername = document.getElementById('username-input').value.trim();
+                if (friendUsername) {
+                    document.getElementById('requestBtn').classList.add('disabled');
+                    firebase.database().ref('Users/' + friendUsername + '/Requests/' + userglobal.uid).once('value', function(snapshot) {
+                        if (snapshot.val()) {
+                            M.toast({html: 'Request already sent'});
+                            document.getElementById('requestBtn').classList.remove('disabled');
+                        } else {
+                            firebase.database().ref('Users/' + userglobal.uid + '/username').once('value', function(snapshot) {
+                                firebase.database().ref('Users/' + friendUsername + '/Requests/' + userglobal.uid).set(snapshot.val()).then(function() {
+                                    M.toast({html: 'Request sent'});
+                                });
+                            });
+                        }
+                    });
+                }
+            }
+        </script>
+>>>>>>> Stashed changes
     </body>
 </html>

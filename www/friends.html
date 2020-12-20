@@ -51,6 +51,10 @@
                 <h5>No friends yet</h5>
                 <h6>Add your friends using the + button below</h6>
             </div>
+            <p id="requests" hidden=true>Friend Requests:</p>
+            <ul class="collection" id="requestlist">
+
+            </ul>
             <ul class="collection" id="friendlist">
                 
             </ul>
@@ -123,6 +127,7 @@
                 }
                     if (sessionStorage.user) {
                         var user = JSON.parse(sessionStorage.user);
+                        showRequests(user);
                         showInfo(user);
                         if (sessionStorage.friends) {
                             var friends = JSON.parse(sessionStorage.friends);
@@ -157,12 +162,20 @@
                                 });
                             
                                 document.getElementById('progressbar').hidden = true;
+                                showRequests(user);
                             } else {
                                 redirect('login.html?source=' + window.location.href);
                             }
                         });
                     }
                 }
+
+                function showRequests(user) {
+                    firebase.database().ref('User/' + user.uid + '/Requests').on('child_added', function(child) {
+                        
+                    });
+                }
+
                 function addUsernameToFriends() {
                     firebase.database().ref('Users').on('child_added', function(data) {
                         firebase.database().ref('Users/' + data.key + '/Friends').on('child_added', function(friend) {
@@ -203,6 +216,7 @@
                     document.getElementById('nav').classList.add('z-depth-3');
                     document.getElementById('nav').style.backgroundColor = '#292929';
                     document.getElementById('friendlist').style.backgroundColor = '#292929';
+                    document.getElementById('requestlist').style.backgroundColor = '#292929';
                     document.getElementById('container').style.backgroundColor = '#292929';
                     
                     Array.from(document.getElementsByClassName('collection-item')).forEach((el) => {

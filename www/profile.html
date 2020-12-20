@@ -92,6 +92,8 @@
 
                         if (user.uid == userID) {
                             document.getElementById('image-button').hidden = false;
+                        } else {
+                            //document.getElementById('friend-remove').hidden = false;
                         }
 
                         firebase.database().ref('Users/' + userID + '/username').once('value', function(snapshot) {

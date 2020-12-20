@@ -27,6 +27,7 @@
                 <li><a href="friends.html" class="waves-effect"><i class="material-icons">groups</i>Friends</a></li>
                 <li><a href="account.html" class="waves-effect"><i class="material-icons">account_circle</i>Account</a></li>
           </ul>
+        </br>
 
         <div class="container">
             <div class="row">
@@ -101,17 +102,17 @@
                 var friendUsername = document.getElementById('username-input').value.trim();
                 if (friendUsername) {
                     document.getElementById('requestBtn').classList.add('disabled');
-                    firebase.database().ref('Users/' + friendUsername + '/Requests/' + userglobal.uid).once('value', function(snapshot) {
-                        if (snapshot.val()) {
-                            M.toast({html: 'Request already sent'});
-                            document.getElementById('requestBtn').classList.remove('disabled');
-                        } else {
-                            firebase.database().ref('Users/' + userglobal.uid + '/username').once('value', function(snapshot) {
-                                firebase.database().ref('Users/' + friendUsername + '/Requests/' + userglobal.uid).set(snapshot.val()).then(function() {
-                                    M.toast({html: 'Request sent'});
-                                });
-                            });
-                        }
+                    firebase.database().ref('Users/' + userglobal.uid + '/username').once('value', function(snapshot) {
+                        firebase.database().ref('Users').on('child_added', function(child) {
+                            console.log(child.val().username);
+                            if (child.val().username == friendUsername) {
+                                firebase.database().ref('Users/' + child.key + '/Requests/' + userglobal.uid).set(snapshot.val());
+                                M.toast({html: 'Request sent'});
+                                document.getElementById('requestBtn').classList.remove('disabled');
+                                document.getElementById('username-input').value = '';
+                                M.updateTextFields();
+                            }
+                        });
                     });
                 }
             }

@@ -31,7 +31,7 @@
 
         <div class="container">
             <div class="row">
-                <div class="input-field">
+                <div class="input-field darkmode-text">
                     <i class="material-icons prefix">person_search</i>
                     <input type="text" id="username-input">
                     <label for="username-input">Enter Friend's Username</label>
@@ -79,6 +79,10 @@
 
             var userglobal;
             function onLoad() {
+              if (localStorage.darkmode == 'true') {
+                darken();
+              }
+      
                 if (sessionStorage.user) {
                     userglobal = JSON.parse(sessionStorage.user);
                 } else {
@@ -115,6 +119,35 @@
                         });
                     });
                 }
+            }
+
+            function darken() {
+                document.getElementById('body').style.backgroundColor = '#121212';
+                Array.from(document.getElementsByClassName('card')).forEach((el) => {
+                    el.style.backgroundColor = '#292929';
+                    el.style.color = 'white';
+                    el.classList.add('z-depth-2');
+                });
+                Array.from(document.getElementsByClassName('chip')).forEach((el) => {
+                    el.style.backgroundColor = '#101010';
+                    el.style.color = 'white';
+                });
+                document.getElementById('slide-out').style.backgroundColor = '#292929';
+                Array.from(document.getElementsByClassName('darkmode-text')).forEach((el) => {
+                    el.style.color = '#e7e7e7';
+                });
+                
+                Array.from(document.getElementsByClassName('deep-orange')).forEach((el) => {
+                    el.classList.remove('deep-orange');
+                    el.style.backgroundColor = '#ff7043';
+                });
+                Array.from(document.getElementsByClassName('deep-orange-text')).forEach((el) => {
+                    el.classList.remove('deep-orange-text');
+                    el.style.color = '#ff7043';
+                });
+                document.getElementById('nav').classList.remove('deep-orange');
+                document.getElementById('nav').classList.add('z-depth-3');
+                document.getElementById('nav').style.backgroundColor = '#292929';
             }
         </script>
     </body>

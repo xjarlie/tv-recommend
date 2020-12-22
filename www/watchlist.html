@@ -82,35 +82,49 @@
                 if (localStorage.darkmode == 'true') {
                     darken();
                 }
-                firebase.auth().onAuthStateChanged(function(user) {
-                    if (user) {
-                        uid = user.uid;
-                        document.getElementById('progressbar').hidden = true;
-                        showInfo(user);
-                        firebase.database().ref('Users/' + uid + '/Watchlist').on('child_added', function(data) {
-                            displayItem(data.val());
-                        });
-                    } else {
-                        redirect('login.html?source=' + window.location.href);
-                    }
-                });
-                
+                if (sessionStorage.user) {
+                    uid = JSON.parse(sessionStorage.user).uid;
+                    showWatchlist();
+                    showInfo(JSON.parse(sessionStorage.user));
+                } else {
+                    firebase.auth().onAuthStateChanged(function(user) {
+                        if (user) {
+                            uid = user.uid;
+                            showWatchlist();
+                            showInfo(user);
+                        } else {
+                            redirect('login.html?source=' + window.location.href);
+                        }
+                    })
+                }
             }
 
-            function displayItem(postID) {
-                if (postID != 'item') {
-                    document.getElementById('nothing').hidden = true;
-                    firebase.database().ref('Posts/' + postID).once('value', function(snapshot) {
-                        var item = document.createElement('div');
-                        item.style = 'color: black;';
-                        item.innerHTML = '<div class="card"><div class="card-content" onclick=\'openPost("' + postID + '")\'><span class="card-title">' + snapshot.val().title + '<span></div><div class="card-action"><a href="#" onclick=\'recommendItem("' + postID + '")\' class="btn deep-orange">Recommend</a>&nbsp&nbsp&nbsp<a href="#" onclick=\'removeFromWatchlist("' + postID + '", this)\' class="btn-flat red-text darken-3">Remove</a></div></div>';                       
-                        document.getElementById('watchlist').appendChild(item);
-                        if (localStorage.darkmode == 'true') {
-                    darken();
-                }
+            function showWatchlist() {
+                if (sessionStorage.watchlist) {
+                    var watchlist = JSON.parse(sessionStorage.getItem('watchlist'));
+                    for (const [key, value] of Object.entries(watchlist)) {
+                        displayItem(value, key);
+                    }
+                } else {
+                    firebase.database().ref('Users/' + uid + '/Watchlist').once('value', function(snapshot) {
+                        sessionStorage.setItem('watchlist', JSON.stringify(snapshot.val()));
+                        showWatchlist();
                     });
                 }
-                
+                document.getElementById('progressbar').hidden = true;
+            }
+
+            function displayItem(post, key) {
+                if (key != 'item') {
+                    document.getElementById('nothing').hidden = true;
+                    var item = document.createElement('div');
+                    item.style = 'color: black;';
+                    item.innerHTML = '<div class="card"><div class="card-content" onclick=\'openPost("' + key + '")\'><span class="card-title">' + post.title + '<span></div><div class="card-action"><a href="#" onclick=\'recommendItem("' + key + '")\' class="btn deep-orange">Recommend</a>&nbsp&nbsp&nbsp<a href="#" onclick=\'removeFromWatchlist("' + key + '", this)\' class="btn-flat red-text darken-3">Remove</a></div></div>';                       
+                    document.getElementById('watchlist').appendChild(item);
+                    if (localStorage.darkmode == 'true') {
+                        darken();
+                    }
+                }
             }
 
             function showInfo(user) {
@@ -142,11 +156,20 @@
             }
 
             function openPost(key) {
+                M.toast({html: 'Loading...'});
                 document.getElementById('progressbar').hidden = false;
-                firebase.database().ref('Posts/' + key).once('value', function(snapshot) {
-                    sessionStorage.setItem('activepost', JSON.stringify(snapshot.val()));
+                if (sessionStorage.watchlist) {
+                    var watchlist = JSON.parse(sessionStorage.watchlist);
+                    var post = watchlist[key];
+                    sessionStorage.setItem('activepost', JSON.stringify(post));
                     redirect('post.html?id=' + key);
-                });
+                } else {
+                    firebase.database().ref('Posts/' + key).once('value', function(snapshot) {
+                        sessionStorage.setItem('activepost', JSON.stringify(snapshot.val()));
+                        redirect('post.html?id=' + key);
+                    });
+                }
+                
             }
 
             function removeFromWatchlist(id, item) {
@@ -197,6 +220,20 @@
             function refresh() {
                 sessionStorage.clear();
                 window.location.reload();
+            }
+
+            function convertWatchlist() {
+                firebase.database().ref('Users').on('child_added', function(user) {
+                    firebase.database().ref('Users/' + user.key + '/Watchlist').on('child_added', function(watchlistItem) {
+                        var postkey = watchlistItem.val();
+                        firebase.database().ref('Posts/' + postkey).once('value', function(postdata) {
+                            var newWatchlistItem = postdata.val();
+                            firebase.database().ref('Users/' + user.key + '/Watchlist/' + postkey).set(newWatchlistItem).then(function() {
+                                M.toast({html: 'done'});
+                            });
+                        });
+                    });
+                });
             }
         </script>
     </body>

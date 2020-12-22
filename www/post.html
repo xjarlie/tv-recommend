@@ -345,7 +345,11 @@
                 }
 
                 function addToWatchlist() {
-                    firebase.database().ref('Users/' + uid + '/Watchlist/' + postID).set(postID);
+                    
+                    firebase.database().ref('Posts/' + postID).once('value', function(snapshot) {
+                        firebase.database().ref('Users/' + uid + '/Watchlist/' + postID).set(snapshot.val());
+                    });
+
                     M.toast({html: 'Added to watchlist'});
 
                     watchlistBtn.innerHTML = '<i class="material-icons left">remove_circle_outline</i>Remove from watchlist';

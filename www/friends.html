@@ -123,8 +123,8 @@
                
                 function onLoad() {
                     if (localStorage.darkmode == 'true') {
-                    darken();
-                }
+                        darken();
+                    }
                     if (sessionStorage.user) {
                         userglobal = JSON.parse(sessionStorage.user);
                         var user = JSON.parse(sessionStorage.user);
@@ -132,7 +132,6 @@
                         showInfo(user);
                         if (sessionStorage.friends) {
                             var friends = JSON.parse(sessionStorage.friends);
-                            console.log(typeof(friends));
                             for (const [key, value] of Object.entries(friends)) {
                                 displayFriend(key, value);
                             }

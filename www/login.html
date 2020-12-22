@@ -51,7 +51,10 @@
                         <a class="waves-effect waves-light btn deep-orange" onclick="login()"><i class="material-icons left">login</i>Log In</a>
                     </div>
                     <div class="row">
-                        <a href="signup.html" id="signuplink"><p class="deep-orange-text">Don't have an account? Click here to create one</p></a>
+                        <a href="signup.html" id="signuplink"><p class="deep-orange-text">Don't have an account? Click here to create one.</p></a>
+                    </div>
+                    <div class="row">
+                        <a href="#" id="resetPass" onclick="resetPass()"><p class="deep-orange-text">Forgot your password? Click here to reset it.</p></a>
                     </div>
                 </form>
             </div>
@@ -112,6 +115,16 @@
                         // Handle Errors here.
                         var errorCode = error.code;
                         var errorMessage = error.message;
+                    });
+                }
+
+                function resetPass() {
+                    var email = prompt('Enter the email address assoiated with your account');
+                    firebase.auth().sendPasswordResetEmail(email).then(function() {
+                        M.toast({html: 'Password reset email sent'});
+                    }).catch(function(error) {
+                        alert(error.message);
+                        console.log('Reset password error: ' + error.code);
                     });
                 }
             </script>

@@ -141,15 +141,18 @@
                 var password = document.getElementById('password').value.trim();
                 if (username && email && password) {
                     firebase.database().ref('Usernames/' + username).once('value', function(snapshot) {
+                        console.log('here');
                         if (snapshot.val()) {
                             alert('This username is taken');
                         } else {
+
                             firebase.auth().createUserWithEmailAndPassword(email, password).catch(function(error) {
                                 // Handle Errors here.
                                 var errorCode = error.code;
                                 var errorMessage = error.message;
                                 // ...
                                 alert(errorMessage);
+                                alert(errorCode);
                             });
                         }
                     });

@@ -215,9 +215,9 @@
                 if (post.category == 1) {
                     category = 'TV Show';
                 } else if (post.category == 2) {
-                    category = 'Movie';
+                    category = 'Film';
                 } else {
-                    category = 'TV/Movie';
+                    category = 'TV/Film';
                 }
                 card.innerHTML = '<a href=# style="color: black; font-weight: bold;" onclick="openPost(\'' + postKey + '\')"><div class="card"><div class="card-content"><span class="card-title" style="font-weight: bold;">' + post.title + '</span><div class="chip">' + category + '</div><p class="deep-orange-text">' + username + '</p></div></div></a>';
                 document.getElementById('collection').prepend(card);

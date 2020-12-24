@@ -91,6 +91,11 @@
                         
                         if (!userID) {
                             userID = user.uid;
+
+                            if (sessionStorage.user) {
+                                var sessionUser = JSON.parse(sessionStorage.user);
+                                document.getElementById('user-display').textContent = user.username;
+                            }
                         }
 
                         if (user.uid == userID) {

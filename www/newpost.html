@@ -129,6 +129,13 @@
                             
                         </div>
                     </div>
+                    <div class="row" id="friend-tag">
+                        <div class="input-field">
+                            <i class="material-icons prefix">account_circle</i>
+                            <input type="text" id="autocomplete-input" class="autocomplete darkmode-text">
+                            <label for="autocomplete-input">Tag a friend</label>
+                        </div>
+                    </div>
                     
                     <div class="row">
                         <a class="waves-effect waves-light btn deep-orange disabled" onclick="post()" id="recommendBtn"><i class="material-icons left">add</i>Loading...</a>
@@ -172,7 +179,34 @@
                         if (user) {
                             document.getElementById('recommendBtn').classList.remove('disabled');
                             document.getElementById('recommendBtn').innerHTML = '<i class="material-icons left">add</i>Recommend';
-                            document.getElementById('progressbar').hidden = true;
+
+                            if (sessionStorage.friends) {
+                                document.getElementById('progressbar').hidden = true;
+
+                                var friends = JSON.parse(sessionStorage.friends);
+
+                                var data = {};
+                                for (const [key, value] of Object.entries(friends)) {
+                                    data[value] = null;
+                                }
+
+                                var instance = M.Autocomplete.getInstance(document.querySelector('.autocomplete'));
+                                instance.updateData(data);
+                            } else {
+                                firebase.database().ref('Users/' + user.uid + '/Friends').once('value', function(snapshot) {
+                                    sessionStorage.setItem('friends', JSON.stringify(snapshot.val()));
+                                    document.getElementById('progressbar').hidden = true;
+                                    var data = {};
+                                    snapshot.forEach((childSnapshot) => {
+                                        data.push(snapshot.val(), null);
+                                        console.log(data);
+                                    });
+
+                                    var elems = document.querySelectorAll('.autocomplete');
+                                    var options = {data: data};
+                                });
+                            }
+                            
 
                             
                             if (fromID) {
@@ -212,7 +246,7 @@
                             var userRating = this.value;
                             rating = userRating;
                         }
-                    ); 
+                    );
                 });
 
                 function redirect(location) {
@@ -222,6 +256,11 @@
                 document.addEventListener('DOMContentLoaded', function() {
                     var elems = document.querySelectorAll('.sidenav');
                     var instances = M.Sidenav.init(elems);
+                });
+
+                document.addEventListener('DOMContentLoaded', function() {
+                    var elems = document.querySelectorAll('.autocomplete');
+                    var instances = M.Autocomplete.init(elems);
                 });
 
                 document.addEventListener('DOMContentLoaded', function() {
@@ -244,6 +283,7 @@
                     var source = document.getElementById('source').value || '';
                     var genre = document.getElementById('genre').value || '';
                     var timestamp = Date.now();
+                    var tagged = document.getElementById('autocomplete-input').value || '';
                     console.log(genre);
                     var category = document.getElementById('category').value || '';
                     var tags = [];
@@ -274,7 +314,8 @@
                             authorname: username,
                             genre: genre,
                             category: category,
-                            timestamp: timestamp
+                            timestamp: timestamp,
+                            tagged: tagged
                         }).then(function() {
                             firebase.database().ref('Users/' + userID + '/Posts').push(ref.key).then(function() {
                                 if (fromID) {

@@ -135,12 +135,20 @@
             
 
             function load() {
-                displayPosts();
                 firebase.database().ref('Users/' + uid + '/Friends').once('value', function(snapshot) {
                     sessionStorage.setItem('friends', JSON.stringify(snapshot.val()));
                     console.log(sessionStorage.friends);
                     document.getElementById('progressbar').hidden = true;
                 });
+
+                if (sessionStorage.username) {
+                    displayPosts();
+                } else {
+                    firebase.database().ref('Users/' + uid + '/username').once('value', function(snapshot) {
+                        sessionStorage.setItem('username', snapshot.val());
+                        displayPosts();
+                    });
+                }
             }
 
             function showInfo(user) {
@@ -219,7 +227,13 @@
                 } else {
                     category = 'TV/Film';
                 }
-                card.innerHTML = '<a href=# style="color: black; font-weight: bold;" onclick="openPost(\'' + postKey + '\')"><div class="card"><div class="card-content"><span class="card-title" style="font-weight: bold;">' + post.title + '</span><div class="chip">' + category + '</div><p class="deep-orange-text">' + username + '</p></div></div></a>';
+
+                var tagged = '';
+                var authusername = sessionStorage.username;
+                if (post.tagged == authusername) {
+                    tagged = '<span class="new badge deep-orange" data-badge-caption=" "><b>Recommended to You</b></span>';
+                }
+                card.innerHTML = '<a href=# style="color: black; font-weight: bold;" onclick="openPost(\'' + postKey + '\')"><div class="card"><div class="card-content">' + tagged + '<span class="card-title" style="font-weight: bold;">' + post.title + '</span><div class="chip">' + category + '</div><p class="deep-orange-text">' + username + '</p></div></div></a>';
                 document.getElementById('collection').prepend(card);
                 document.getElementById('nothing').hidden = true;
                 if (localStorage.darkmode == 'true') {

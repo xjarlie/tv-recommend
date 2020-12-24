@@ -243,6 +243,7 @@
                     var tagsNodeList = document.getElementById('descriptors').childNodes || [];
                     var source = document.getElementById('source').value || '';
                     var genre = document.getElementById('genre').value || '';
+                    var timestamp = Date.now();
                     console.log(genre);
                     var category = document.getElementById('category').value || '';
                     var tags = [];
@@ -272,7 +273,8 @@
                             rating: rating,
                             authorname: username,
                             genre: genre,
-                            category: category
+                            category: category,
+                            timestamp: timestamp
                         }).then(function() {
                             firebase.database().ref('Users/' + userID + '/Posts').push(ref.key).then(function() {
                                 if (fromID) {

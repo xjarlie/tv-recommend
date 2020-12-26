@@ -108,7 +108,6 @@
                     document.getElementById('requestBtn').classList.add('disabled');
                     firebase.database().ref('Users/' + userglobal.uid + '/username').once('value', function(snapshot) {
                         firebase.database().ref('Users').on('child_added', function(child) {
-                            console.log(child.val().username);
                             if (child.val().username == friendUsername) {
                                 firebase.database().ref('Users/' + child.key + '/Requests/' + userglobal.uid).set(snapshot.val());
                                 M.toast({html: 'Request sent'});

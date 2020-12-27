@@ -84,6 +84,22 @@
                     </div>
                 </div>
             </div>
+            <!-- <div class="row">
+                <div class="card">
+                    <div class="card-content darkmode-text">
+                        <span class="card-title">
+                            JustWatch Search Region
+                        </span>
+                        <div class="input-field darkmode-text">
+                            <select id="category" onchange="regionChange()">
+                                <option value="uk" class="darkmode-text" id="uk-option">UK</option>
+                                <option value="us" class="waves-effect" class="darkmode-text" id="us-option">US</option>
+                                <option value="kr" class="waves-effect" class="darkmode-text" id="kr-option">South Korea</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div> -->
         </div>
 
         <!-- The core Firebase JS SDK is always required and must be listed first -->
@@ -180,6 +196,18 @@
                         }
                     })
                 }
+
+                /* if (localStorage.region) {
+                    document.getElementById('category').value = localStorage.region;
+
+                    if (localStorage.region == 'us') {
+                        document.getElementById('uk-option').removeAttribute('selected');
+                        document.getElementById('us-option').selected = true;
+                    } else if (localStorage.region == 'kr') {
+                        document.getElementById('uk-option').removeAttribute('selected');
+                        document.getElementById('kr-option').selected = true;
+                    }
+                } */
             }
 
             function showInfo(user) {
@@ -226,6 +254,18 @@
                     firebase.auth().signOut();
                     onLoad();
                 }
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+                var elems = document.querySelectorAll('select');
+                var instances = M.FormSelect.init(elems);
+                if (localStorage.darkmode == 'true') {
+                    darken();
+                }
+            });
+
+            function regionChange() {
+                localStorage.region = document.getElementById('category').value;
             }
         </script>
     </body>

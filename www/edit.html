@@ -73,7 +73,7 @@
                         <b>
                         <div class="input-field">
                             <input id="title" type="text">
-                            <label for="title" class="active">TV Show/Movie Title</label>
+                            <label for="title" class="active">TV Show/Film Title</label>
                         </div>
                         </b>
                     </div>
@@ -111,10 +111,10 @@
                     </div>
                     <div class="row">
                         <div class="input-field">
-                            <select id="category">
-                                <option value="0" disabled selected id="no-option">TV or Movie</option>
+                            <select id="1">
+                                <option value="0" disabled selected id="no-option">TV or Film</option>
                                 <option value="1" class="waves-effect" id="tv-option">TV Show</option>
-                                <option value="2" class="waves-effect" id="movie-option">Movie</option>
+                                <option value="2" class="waves-effect" id="Film-option">Film</option>
                             </select>
                             <label>Type of recommendation</label>
                         </div>
@@ -174,7 +174,7 @@
                                     document.getElementById('tv-option').selected = true;
                                 } else if (post.category == 2) {
                                     document.getElementById('no-option').removeAttribute('selected');
-                                    document.getElementById('movie-option').selected = true;
+                                    document.getElementById('Film-option').selected = true;
                                 }
 
                                 document.getElementById('genre').value = post.genre || '';

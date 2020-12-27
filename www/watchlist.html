@@ -105,13 +105,15 @@
                     for (const [key, value] of Object.entries(watchlist)) {
                         displayItem(value, key);
                     }
+                    document.getElementById('progressbar').hidden = true;
                 } else {
                     firebase.database().ref('Users/' + uid + '/Watchlist').once('value', function(snapshot) {
                         sessionStorage.setItem('watchlist', JSON.stringify(snapshot.val()));
                         showWatchlist();
+                        document.getElementById('progressbar').hidden = true;
                     });
                 }
-                document.getElementById('progressbar').hidden = true;
+                
             }
 
             function displayItem(post, key) {

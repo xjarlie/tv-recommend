@@ -259,11 +259,20 @@
 
             function openPost(key) {
                 M.toast({html: 'Loading...'});
-                document.getElementById('progressbar').hidden = false;
-                firebase.database().ref('Posts/' + key).once('value', function(snapshot) {
-                    sessionStorage.setItem('activepost', JSON.stringify(snapshot.val()));
+                if (sessionStorage.posts) {
+                    var posts = JSON.parse(sessionStorage.posts);
+                    var post = posts.filter(item => {
+                        return item.key === key;
+                    });
+                    console.log(post);
+                    sessionStorage.setItem('activepost', JSON.stringify(post[0]));
                     redirect('post.html?id=' + key);
-                });
+                } else {
+                    firebase.database().ref('Posts/' + key).once('value', function(snapshot) {
+                        sessionStorage.setItem('activepost', JSON.stringify(snapshot.val()));
+                        redirect('post.html?id=' + key);
+                    });
+                }
             }
 
             function darken() {

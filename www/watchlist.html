@@ -163,7 +163,8 @@
                 if (sessionStorage.watchlist) {
                     var watchlist = JSON.parse(sessionStorage.watchlist);
                     var post = watchlist[key];
-                    sessionStorage.setItem('activepost', JSON.stringify(post));
+                    var activepost = {key: key, post: post};
+                    sessionStorage.setItem('activepost', JSON.stringify(activepost));
                     redirect('post.html?id=' + key);
                 } else {
                     firebase.database().ref('Posts/' + key).once('value', function(snapshot) {

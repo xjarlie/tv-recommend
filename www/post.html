@@ -199,15 +199,15 @@
                     if (sessionStorage.getItem('activepost')) {
                         var post = JSON.parse(sessionStorage.getItem('activepost'));
                         
-                        document.getElementById('title').innerHTML = post.title;
-                        document.getElementById('author').innerHTML = post.authorname;
-                        document.getElementById('author-link').href = 'profile.html?id=' + post.author;
-                        document.getElementById('wheretowatch').href = 'https://justwatch.com/uk/search?q=' + post.title;
-                        document.getElementById('source').innerHTML = 'Watched On: ' + post.source || '';
-                        document.getElementById('description').innerHTML = post.description || '';
-                        document.getElementById('genre').innerHTML = 'Genre: ' + post.genre || '';
+                        document.getElementById('title').innerHTML = post.post.title;
+                        document.getElementById('author').innerHTML = post.post.authorname;
+                        document.getElementById('author-link').href = 'profile.html?id=' + post.post.author;
+                        document.getElementById('wheretowatch').href = 'https://justwatch.com/uk/search?q=' + post.post.title;
+                        document.getElementById('source').innerHTML = 'Watched On: ' + post.post.source || '';
+                        document.getElementById('description').innerHTML = post.post.description || '';
+                        document.getElementById('genre').innerHTML = 'Genre: ' + post.post.genre || '';
 
-                        var category = post.category;
+                        var category = post.post.category;
                         if (category) {
                             if (category == 1) {
                                 document.getElementById('category').innerHTML = 'TV Show';
@@ -219,8 +219,8 @@
                             
                         }
 
-                        if (post.tags) {
-                            post.tags.forEach(function(tag) {
+                        if (post.post.tags) {
+                            post.post.tags.forEach(function(tag) {
                             var chip = document.createElement('div');
                             chip.classList = 'chip';
                             chip.innerHTML = tag;
@@ -234,7 +234,7 @@
                             };
                         });
                         document.getElementById('rating').hidden = false;
-                        var rating = post.rating;
+                        var rating = post.post.rating;
                         var i = 1;
                         while (i <= rating) {
                             document.getElementById('star-' + i).classList += ' checked';
@@ -415,9 +415,9 @@
                 }
 
                 function refresh() {
-                sessionStorage.clear();
-                window.location.reload();
-            }
+                    sessionStorage.clear();
+                    window.location.reload();
+                }
             </script>
     </body>
 </html>

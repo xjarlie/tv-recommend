@@ -121,13 +121,31 @@
                     document.getElementById('nothing').hidden = true;
                     var item = document.createElement('div');
                     item.style = 'color: black;';
-                    item.innerHTML = '<div class="card"><div class="card-content" onclick=\'openPost("' + key + '")\'><span class="card-title">' + post.title + '<span></div><div class="card-action"><a href="#" onclick=\'recommendItem("' + key + '")\' class="btn deep-orange">Recommend</a>&nbsp&nbsp&nbsp<a href="#" onclick=\'removeFromWatchlist("' + key + '", this)\' class="btn-flat red-text darken-3">Remove</a></div></div>';                       
+                    var category;
+                    if (post.category == 1) {
+                        category = 'TV Show';
+                    } else if (post.category == 2) {
+                        category = 'Film';
+                    } else {
+                        category = 'TV/Film';
+                    }
+                    var tagged = '';
+                    console.log(post);
+                    var authusername = sessionStorage.username;
+                    if (post.tagged) {
+                        if (post.tagged == authusername) {
+                            tagged = '<span class="new badge deep-orange" data-badge-caption=" "><b>Recommended to You</b></span>';
+                        }
+                    }
+                    item.innerHTML = '<div class="card"><div class="card-content" onclick=\'openPost("' + key + '")\'>' + tagged + '<span class="card-title" style="font-weight: bold;">' + post.title + '</span><div class="chip">' + category + '</div></div><div class="card-action"><a href="#" onclick=\'recommendItem("' + key + '")\' class="btn deep-orange">Recommend</a>&nbsp&nbsp&nbsp<a href="#" onclick=\'removeFromWatchlist("' + key + '", this)\' class="btn-flat red-text darken-3">Remove</a></div></div>';                       
                     document.getElementById('watchlist').appendChild(item);
                     if (localStorage.darkmode == 'true') {
                         darken();
                     }
                 }
             }
+
+            
 
             function showInfo(user) {
                 if (sessionStorage.getItem('email') && sessionStorage.getItem('username')) {

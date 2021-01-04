@@ -198,6 +198,7 @@
 
                     if (sessionStorage.getItem('activepost')) {
                         var post = JSON.parse(sessionStorage.getItem('activepost'));
+                        console.log(post);
                         
                         document.getElementById('title').innerHTML = post.post.title;
                         document.getElementById('author').innerHTML = post.post.authorname;

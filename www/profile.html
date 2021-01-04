@@ -127,15 +127,41 @@
                 firebase.database().ref('Users/' + userID + '/Posts').on('child_added', function(data) {
                     var postKey = data.key;
                     firebase.database().ref('Posts/' + data.val()).once('value', function(snapshot) {
-                        var post = document.createElement('div');
-                        post.classList.add('row');
-                        post.innerHTML = '<a href=post.html?id=' + data.val() + ' style="color: black; font-weight: bold;"><div class="card"><div class="card-content"><span class="card-title">' + snapshot.val().title + '</span></div></div></a>';
-                        document.getElementById('post-display').appendChild(post);
+                        var postDOM = document.createElement('div');
+                        var post = snapshot.val();
+                        postDOM.classList.add('row');
+                        var category;
+                        if (post.category == 1) {
+                            category = 'TV Show';
+                        } else if (post.category == 2) {
+                            category = 'Film';
+                        } else {
+                            category = 'TV/Film';
+                        }
+                        var tagged = '';
+                        if (post.tagged) {
+                            if (post.tagged == authusername) {
+                                tagged = '<span class="new badge deep-orange" data-badge-caption=" "><b>Recommended to You</b></span>';
+                            }
+                        }
+                        postDOM.innerHTML = '<a onclick="openPost(\'' + data.val() + '\')" style="color: black; font-weight: bold;"><div class="card"><div class="card-content">' + tagged + '<span class="card-title" style="font-weight: bold;">' + post.title + '</span><div class="chip">' + category + '</div></div></div></a>';
+                        document.getElementById('post-display').appendChild(postDOM);
                         document.getElementById('nothing').hidden = true;
                         if (localStorage.darkmode == 'true') {
-                    darken();
-                }
+                            darken();
+                        }
                     });
+                });
+            }
+
+            function openPost(key) {
+                M.toast({html: 'Loading...'});
+                console.log(key);
+                firebase.database().ref('Posts/' + key).once('value', function(snapshot) {
+                    console.log(snapshot.val());
+                    var postSet = {post: snapshot.val()};
+                    sessionStorage.setItem('activepost', JSON.stringify(postSet));
+                    redirect('post.html?id=' + key);
                 });
             }
 

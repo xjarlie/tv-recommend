@@ -42,7 +42,7 @@
 }
         </style>
     </head>
-    <body onload="onLoad()">
+    <body onload="onLoad()" id="body">
         <div class="navbar-fixed">
             <nav class="deep-orange" id="nav">
                 <div class="nav-wrapper">
@@ -72,7 +72,7 @@
                     <div class="row">
                         <b>
                         <div class="input-field">
-                            <input id="title" type="text">
+                            <input id="title" type="text" class="darkmode-text">
                             <label for="title" class="active">TV Show/Film Title</label>
                         </div>
                         </b>
@@ -93,25 +93,25 @@
                     
                     <div class="row">
                         <div class="input-field">
-                            <input id="genre" type="text">
+                            <input id="genre" type="text" class="darkmode-text">
                             <label for="genre">Genre (Optional)</label>
                         </div>
                     </div>
                     <div class="row">
-                        <div class="input-field">
-                            <input id="source" type="text">
+                        <div class="input-field darkmode-text">
+                            <input id="source" type="text" class="darkmode-text">
                             <label for="source">Where did you watch it? (Netflix, Amazon, etc)</label>
                         </div>
                     </div>
                     <div class="row">
-                        <div class="input-field">
-                            <textarea id="description" class="materialize-textarea"></textarea>
+                        <div class="input-field darkmode-text">
+                            <textarea id="description" class="materialize-textarea darkmode-text"></textarea>
                             <label for="description">A Short Review (Optional)</label>
                         </div>
                     </div>
                     <div class="row">
                         <div class="input-field">
-                            <select id="1">
+                            <select id="category" class="darkmode-text">
                                 <option value="0" disabled selected id="no-option">TV or Film</option>
                                 <option value="1" class="waves-effect" id="tv-option">TV Show</option>
                                 <option value="2" class="waves-effect" id="Film-option">Film</option>
@@ -156,6 +156,9 @@
             var postID = window.location.search.split('?id=')[1];
             var rating;
             function onLoad() {
+                if (localStorage.darkmode) {
+                    darken();
+                }
                 firebase.auth().onAuthStateChanged(function(user) {
                     if (user) {
                         uid = user.uid;
@@ -167,7 +170,7 @@
                                 document.getElementById('progressbar').hidden = true;
 
                                 document.getElementById('title').value = post.title;
-                                document.getElementById('category').value = post.category;
+                                document.getElementById('category').value = post.category || '';
 
                                 if (post.category == 1) {
                                     document.getElementById('no-option').removeAttribute('selected');
@@ -193,6 +196,9 @@
 
                                 document.getElementById('saveBtn').classList.remove('disabled');
                                 document.getElementById('saveBtn').innerHTML = '<i class="material-icons left">save</i>Save Post';
+                                if (localStorage.darkmode) {
+                                    darken();
+                                }
                             } else {
                                 window.location.back();
                             }
@@ -250,6 +256,40 @@
             $(document).ready(function(){
                 $('select').formSelect();
             });
+
+            function darken() {
+                    document.getElementById('body').style.backgroundColor = '#121212';
+                    Array.from(document.getElementsByClassName('input')).forEach((el) => {
+                        el.classList.add('darkmode-text');
+                    });
+                    Array.from(document.getElementsByClassName('select-dropdown')).forEach((el) => {
+                        el.classList.add('darkmode-text');
+                    });
+                    Array.from(document.getElementsByClassName('card')).forEach((el) => {
+                        el.style.backgroundColor = '#292929';
+                        el.style.color = 'white';
+                        el.classList.add('z-depth-2');
+                    });
+                    Array.from(document.getElementsByClassName('chip')).forEach((el) => {
+                        el.style.backgroundColor = '#101010';
+                        el.style.color = 'white';
+                    });
+                    document.getElementById('slide-out').style.backgroundColor = '#292929';
+                    Array.from(document.getElementsByClassName('darkmode-text')).forEach((el) => {
+                        el.style.color = '#e7e7e7';
+                    });
+                    Array.from(document.getElementsByClassName('deep-orange')).forEach((el) => {
+                        el.classList.remove('deep-orange');
+                        el.style.backgroundColor = '#ff7043';
+                    });
+                    Array.from(document.getElementsByClassName('deep-orange-text')).forEach((el) => {
+                        el.classList.remove('deep-orange-text');
+                        el.style.color = '#ff7043';
+                    });
+                    document.getElementById('nav').classList.remove('deep-orange');
+                    document.getElementById('nav').classList.add('z-depth-3');
+                    document.getElementById('nav').style.backgroundColor = '#292929';
+                }
         </script>
     </body>
 </html>

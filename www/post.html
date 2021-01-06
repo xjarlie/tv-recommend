@@ -56,7 +56,11 @@
                 <span class="fa fa-star" id="star-5"></span>
               </div>
               <div class="row"><a id="author-link"><p id="author" class="flow-text darkmode-text " style="color: darkgrey; font-weight: bold;"></p></a></div>
-              
+              <div class="row">
+                <div style="width: 25%;">
+                    <i onclick="likeToggle()" class="small material-icons darkmode-text" id="likeButton">favorite_border</i>
+                </div>
+              </div>
               <div class="row" id="watchlist" hidden=true>
                   <button type="button" class="waves-effect btn deep-orange" id="watchlistbtn"></button>
               </div>
@@ -109,6 +113,7 @@
                 var watchlistBtn = document.getElementById('watchlistbtn');
                 var watchlistRow = document.getElementById('watchlist');
                 var postID = window.location.search.split('?id=')[1];
+                var username;
                 
                 function onLoad() {
                     if (localStorage.darkmode == 'true') {
@@ -116,7 +121,10 @@
                     }
                     if (sessionStorage.getItem('user')) {
                         uid = JSON.parse(sessionStorage.getItem('user')).uid;
-                        postID = window.location.search.split('?id=')[1]; 
+                        postID = window.location.search.split('?id=')[1];
+                        firebase.database().ref('Users/' + uid + '/username').once('value', function(snapshot) {
+                            username = snapshot.val();
+                        });
 
                         firebase.database().ref('Posts/' + postID + '/author').once('value', function(snapshot) {
                             console.log(snapshot);
@@ -199,6 +207,11 @@
                     if (sessionStorage.getItem('activepost')) {
                         var post = JSON.parse(sessionStorage.getItem('activepost'));
                         console.log(post);
+
+                        if (post.post.Likes[uid]) {
+                            document.getElementById('likeButton').textContent = 'favorite';
+                            document.getElementById('likeButton').classList.add('deep-orange-text');
+                        }
                         
                         document.getElementById('title').innerHTML = post.post.title;
                         document.getElementById('author').innerHTML = post.post.authorname;
@@ -225,14 +238,9 @@
                             var chip = document.createElement('div');
                             chip.classList = 'chip';
                             chip.innerHTML = tag;
-                            document.getElementById('tags').appendChild(chip);
+                            document.getElementById('tags').appendChilfirebase.database().ref('Posts/' + postID).once('value', function(snapshot) {
+                            sessionStorage.activepost = JSON.stringify(snapshot.val());
                         });
-                        var chipArray = Array.from(document.getElementsByClassName('chip'))
-                        chipArray.forEach(function(chip) {
-                            console.log(chip);
-                            chip.onclick = function() {
-                                redirect('tag.html?tag=' + chip.innerHTML.split('<i')[0].toLowerCase());
-                            };
                         });
                         document.getElementById('rating').hidden = false;
                         var rating = post.post.rating;
@@ -383,6 +391,43 @@
                             redirect('edit.html?id=' + postID);
                         }
                     });
+                }
+
+                function likeToggle() {
+                    var post = JSON.parse(sessionStorage.getItem('activepost')).post;
+                    if (post.Likes[uid]) {
+                        unLike();
+                    } else {
+                        like();
+                    }
+                }
+
+                function like() {
+                    document.getElementById('likeButton').textContent = 'favorite';
+                    document.getElementById('likeButton').classList.add('deep-orange-text');
+                    firebase.database().ref('Posts/' + postID + '/Likes/' + uid).set(username).then(function() {
+                        firebase.database().ref('Posts/' + postID).once('value', function(snapshot) {
+                            var post2 = {post: snapshot.val()};
+                            sessionStorage.activepost = JSON.stringify(post2);
+                        });
+                        
+                        if (localStorage.darkmode == 'true') {
+                            darken();
+                        }
+                    });
+                }
+
+                function unLike() {
+                    firebase.database().ref('Posts/' + postID + '/Likes/' + uid).remove();
+                    firebase.database().ref('Posts/' + postID).once('value', function(snapshot) {
+                        var post2 = {post: snapshot.val()};
+                        sessionStorage.activepost = JSON.stringify(post2);
+                    });
+                    document.getElementById('likeButton').textContent = 'favorite_border';
+                    document.getElementById('likeButton').classList.remove('deep-orange-text');
+                    if (localStorage.darkmode == 'true') {
+                        darken();
+                    }
                 }
 
                 function darken() {

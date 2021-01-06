@@ -316,7 +316,8 @@
                             genre: genre,
                             category: category,
                             timestamp: timestamp,
-                            tagged: tagged
+                            tagged: tagged,
+                            Likes: {init: 'init'}
                         }).then(function() {
                             firebase.database().ref('Users/' + userID + '/Posts').push(ref.key).then(function() {
                                 if (fromID) {

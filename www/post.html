@@ -56,10 +56,13 @@
                 <span class="fa fa-star" id="star-5"></span>
               </div>
               <div class="row"><a id="author-link"><p id="author" class="flow-text darkmode-text " style="color: darkgrey; font-weight: bold;"></p></a></div>
-              <div class="row">
+              <div class="row" id="likerow" hidden=true>
                 <div style="width: 25%;">
                     <i onclick="likeToggle()" class="small material-icons darkmode-text" id="likeButton">favorite_border</i>
                 </div>
+              </div>
+              <div class="row" id="viewlikes" hidden=true>
+                  <button type="button" class="waves-effect btn deep-orange" onclick="viewLikes()">View Likes</button>
               </div>
               <div class="row" id="watchlist" hidden=true>
                   <button type="button" class="waves-effect btn deep-orange" id="watchlistbtn"></button>
@@ -131,8 +134,10 @@
                             if (snapshot.val() == uid) {
                                 document.getElementById('delete').hidden = false;
                                 document.getElementById('edit').hidden = false;
+                                document.getElementById('viewlikes').hidden = false;
                             } else {
                                 document.getElementById('recommend').hidden = false;
+                                document.getElementById('likerow').hidden = false;
                             }
                             if (localStorage.darkmode == 'true') {
                     darken();
@@ -208,9 +213,11 @@
                         var post = JSON.parse(sessionStorage.getItem('activepost'));
                         console.log(post);
 
-                        if (post.post.Likes[uid]) {
-                            document.getElementById('likeButton').textContent = 'favorite';
-                            document.getElementById('likeButton').classList.add('deep-orange-text');
+                        if (post.post.Likes) {
+                            if (post.post.Likes[uid]) {
+                                document.getElementById('likeButton').textContent = 'favorite';
+                                document.getElementById('likeButton').classList.add('deep-orange-text');
+                            }
                         }
                         
                         document.getElementById('title').innerHTML = post.post.title;
@@ -238,9 +245,7 @@
                             var chip = document.createElement('div');
                             chip.classList = 'chip';
                             chip.innerHTML = tag;
-                            document.getElementById('tags').appendChilfirebase.database().ref('Posts/' + postID).once('value', function(snapshot) {
-                            sessionStorage.activepost = JSON.stringify(snapshot.val());
-                        });
+                            document.getElementById('tags').appendChild(chip);
                         });
                         document.getElementById('rating').hidden = false;
                         var rating = post.post.rating;
@@ -395,11 +400,17 @@
 
                 function likeToggle() {
                     var post = JSON.parse(sessionStorage.getItem('activepost')).post;
-                    if (post.Likes[uid]) {
-                        unLike();
+                    console.log(JSON.parse(sessionStorage.getItem('activepost')).post);
+                    if (post.Likes) {
+                        if (post.Likes[uid]) {
+                            unLike();
+                        } else {
+                            like();
+                        }
                     } else {
                         like();
                     }
+                    
                 }
 
                 function like() {
@@ -427,6 +438,17 @@
                     document.getElementById('likeButton').classList.remove('deep-orange-text');
                     if (localStorage.darkmode == 'true') {
                         darken();
+                    }
+                }
+
+                function viewLikes() {
+                    if (JSON.parse(sessionStorage.getItem('activepost')).post['author'] == uid) {
+                        
+                        var likeString;
+                        var likeArray = JSON.parse(sessionStorage.getItem('activepost')).post.Likes;
+                        alert('These people liked your post: \n ' + JSON.stringify(likeArray));
+                    } else {
+                        console.log('welp');
                     }
                 }
 

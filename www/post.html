@@ -134,10 +134,10 @@
                             if (snapshot.val() == uid) {
                                 document.getElementById('delete').hidden = false;
                                 document.getElementById('edit').hidden = false;
-                                document.getElementById('viewlikes').hidden = false;
+                                //document.getElementById('viewlikes').hidden = false;
                             } else {
                                 document.getElementById('recommend').hidden = false;
-                                document.getElementById('likerow').hidden = false;
+                                //document.getElementById('likerow').hidden = false;
                             }
                             if (localStorage.darkmode == 'true') {
                     darken();
@@ -175,6 +175,7 @@
                                 firebase.database().ref('Posts/' + postID + '/author').once('value', function(snapshot) {
                                     if (snapshot.val() == uid) {
                                         document.getElementById('delete').hidden = false;
+                                        document.getElementById('edit').hidden = false;
                                     } else {
                                         document.getElementById('recommend').hidden = false;
                                     }
@@ -398,7 +399,7 @@
                     });
                 }
 
-                function likeToggle() {
+                /* function likeToggle() {
                     var post = JSON.parse(sessionStorage.getItem('activepost')).post;
                     console.log(JSON.parse(sessionStorage.getItem('activepost')).post);
                     if (post.Likes) {
@@ -450,7 +451,7 @@
                     } else {
                         console.log('welp');
                     }
-                }
+                } */
 
                 function darken() {
                     document.getElementById('body').style.backgroundColor = '#121212';

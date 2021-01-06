@@ -182,6 +182,9 @@
                     request.href = 'profile.html?id=' + uid;
                     request.innerHTML = '<li class="collection-item darkmode-text"><div>' + name + '<a href="#" class="secondary-content" onclick="rejectFriend(\'' + uid + '\')"><i class="material-icons red-text">clear</i></a><a href="#!" class="secondary-content" style="padding-right: 1rem;" onclick="acceptFriend(\'' + uid + '\', \'' + name + '\')"><i class="material-icons green-text">done</i></a></div></li>';
                     document.getElementById('requestlist').prepend(request);
+                    if (localStorage.darkmode == 'true') {
+                        darken();
+                    }
                 }
 
                 function addUsernameToFriends() {

@@ -1,4 +1,7 @@
 # tv-recommend (WhatsOn)
+
+### This version of WhatsOn is deprecated, please see v2: [whatson-v2](https://github.com/xjarlie/whatson-v2) in current active development
+
 ## About and links
 WhatsOn is a web/android app for recommending TV and films to friends - it includes a detailed post function, the ability to add recommendations to your watchlist, and a link to JustWatch to find availability information.
 
